@@ -5,7 +5,7 @@ from lib.csv import CSV
 import time
 
 #set up i2c bus
-i2c = I2C(scl=Pin(1), sda=Pin(0))
+i2c = I2C(id = 0, scl = Pin(1), sda = Pin(0), freq = 400000)
 
 #set up Inertial Measurement Unit
 imu = MPU6050(i2c)
