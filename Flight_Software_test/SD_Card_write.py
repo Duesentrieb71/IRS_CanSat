@@ -1,62 +1,43 @@
-# Test for sdcard block protocol
-# Peter hinch 30th Jan 2016
-import os, machine
+from machine import I2C, Pin, SPI
+from lib.imu import MPU6050
+from lib.bmp280 import BMP280
+from lib.csv import CSV
 from lib import sdcard1
+import uos
+import utime
+import time
 
+# Assign chip select (CS) pin (and start it high)
+cs = Pin(5, Pin.OUT)
 
-def sdtest():
-    spi = machine.SPI(1)
-    spi.init()  # Ensure right baudrate
-    sd = sdcard1.SDCard(spi, machine.Pin.board.X21)  # Compatible with PCB
-    vfs = os.VfsFat(sd)
-    os.mount(vfs, "/fc")
-    print("Filesystem check")
-    print(os.listdir("/fc"))
+# Intialize SPI peripheral (start with 1 MHz)
+spi = SPI(0,
+                  baudrate=1000000,
+                  polarity=0,
+                  phase=0,
+                  bits=8,
+                  firstbit=SPI.MSB,
+                  sck=Pin(2),
+                  mosi=Pin(3),
+                  miso=Pin(4))
 
-    line = "abcdefghijklmnopqrstuvwxyz\n"
-    lines = line * 200  # 5400 chars
-    short = "1234567890\n"
+# Initialize SD card
+sd = sdcard1.SDCard(spi, cs)
 
-    fn = "/fc/rats.txt"
-    print()
-    print("Multiple block read/write")
-    with open(fn, "w") as f:
-        n = f.write(lines)
-        print(n, "bytes written")
-        n = f.write(short)
-        print(n, "bytes written")
-        n = f.write(lines)
-        print(n, "bytes written")
+# Mount filesystem
+vfs = uos.VfsFat(sd)
+uos.mount(vfs, "/sd")
 
-    with open(fn, "r") as f:
-        result1 = f.read()
-        print(len(result1), "bytes read")
+header = ['time', 'pressure', 'temperature', 'accel_x', 'accel_y', 'accel_z', 'gyro_x', 'gyro_y', 'gyro_z']
 
-    fn = "/fc/rats1.txt"
-    print()
-    print("Single block read/write")
-    with open(fn, "w") as f:
-        n = f.write(short)  # one block
-        print(n, "bytes written")
+starttime_ms = utime.ticks_ms()
 
-    with open(fn, "r") as f:
-        result2 = f.read()
-        print(len(result2), "bytes read")
+timestamp = 0
 
-    os.umount("/fc")
-
-    print()
-    print("Verifying data read back")
-    success = True
-    if result1 == "".join((lines, short, lines)):
-        print("Large file Pass")
-    else:
-        print("Large file Fail")
-        success = False
-    if result2 == short:
-        print("Small file Pass")
-    else:
-        print("Small file Fail")
-        success = False
-    print()
-    print("Tests", "passed" if success else "failed")
+csv = CSV('/sd/data.csv', header)
+while timestamp < 100000:
+    long_string = ["sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd"]
+    csv.csv_write(long_string)
+    timestamp = utime.ticks_diff(utime.ticks_ms(), starttime_ms)
+    print(timestamp)
+csv.close()
