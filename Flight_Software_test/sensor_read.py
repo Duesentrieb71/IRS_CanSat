@@ -2,6 +2,7 @@ from machine import I2C, Pin
 from lib.imu import MPU6050
 from lib.bmp280 import BMP280
 from lib.csv import CSV
+import utime
 import time
 
 #set up i2c bus
@@ -17,18 +18,20 @@ header = ['time', 'pressure', 'temperature', 'accel_x', 'accel_y', 'accel_z', 'g
 
 csv = CSV('data.csv', header)
 
-starttime = time.time_ns()
+starttime_ms = utime.ticks_ms()
+starttime = time.time()
+timestamp = 0
 
-while True:
+while timestamp < 100000:
     imu_accel = [imu.accel.x, imu.accel.y, imu.accel.z]
     imu_gyro = [imu.gyro.x, imu.gyro.y, imu.gyro.z]
     imu_temperature = [imu.temperature]
-    pressure_pressure = ["none"] #[pressure.pressure]
-    timestamp = [time.time_ns() - starttime]
+    pressure_pressure = [pressure.pressure]
+    timestamp = utime.ticks_diff(utime.ticks_ms(), starttime_ms)
+    realtime = [time.time() - starttime]
 
-    output = timestamp + pressure_pressure + imu_temperature + imu_accel + imu_gyro
-    
-    for i in output:
-        csv.csv_write(i)
+    output = realtime + [timestamp] + pressure_pressure + imu_temperature + imu_accel + imu_gyro
+    print(output)
+    csv.csv_write(output)
         
 csv.close()
