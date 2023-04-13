@@ -2,7 +2,7 @@ from machine import I2C, Pin, SPI
 from lib.imu import MPU6050
 from lib.bmp280 import BMP280
 from lib.csv import CSV
-from lib import sdcard1
+from lib import sdcard
 import uos
 import utime
 import time
@@ -22,7 +22,7 @@ spi = SPI(0,
                   miso=Pin(4))
 
 # Initialize SD card
-sd = sdcard1.SDCard(spi, cs)
+sd = sdcard.SDCard(spi, cs)
 
 # Mount filesystem
 vfs = uos.VfsFat(sd)
@@ -35,9 +35,15 @@ starttime_ms = utime.ticks_ms()
 timestamp = 0
 
 csv = CSV('/sd/data.csv', header)
-while timestamp < 100000:
-    long_string = ["sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd"]
+while timestamp < 1000:
+    long_string = [timestamp, "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd"]
     csv.csv_write(long_string)
     timestamp = utime.ticks_diff(utime.ticks_ms(), starttime_ms)
     print(timestamp)
 csv.close()
+
+#copy file to main directory
+with open('/sd/data.csv', 'r') as f:
+    with open('data.csv', 'w') as f1:
+        for line in f:
+            f1.write(line)

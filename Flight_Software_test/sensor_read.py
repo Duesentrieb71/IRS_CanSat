@@ -2,7 +2,7 @@ from machine import I2C, Pin, SPI
 from lib.imu import MPU6050
 from lib.bmp280 import BMP280
 from lib.csv import CSV
-from lib import sdcard1
+from lib import sdcard
 import uos
 import utime
 import time
@@ -11,18 +11,10 @@ import time
 cs = Pin(5, Pin.OUT)
 
 # Intialize SPI peripheral (start with 1 MHz)
-spi = SPI(0,
-                  baudrate=1000000,
-                  polarity=0,
-                  phase=0,
-                  bits=8,
-                  firstbit=SPI.MSB,
-                  sck=Pin(2),
-                  mosi=Pin(3),
-                  miso=Pin(4))
+spi = SPI(0, baudrate=1000000, polarity=0, phase=0, bits=8, firstbit=SPI.MSB, sck=Pin(2), mosi=Pin(3), miso=Pin(4))
 
 # Initialize SD card
-sd = sdcard1.SDCard(spi, cs)
+sd = sdcard.SDCard(spi, cs)
 
 # Mount filesystem
 vfs = uos.VfsFat(sd)
