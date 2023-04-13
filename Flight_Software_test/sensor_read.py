@@ -5,7 +5,7 @@ from lib.csv import CSV
 import time
 
 #set up i2c bus
-i2c = I2C(scl=Pin(5), sda=Pin(4))
+i2c = I2C(scl=Pin(1), sda=Pin(0))
 
 #set up Inertial Measurement Unit
 imu = MPU6050(i2c)
@@ -31,6 +31,4 @@ while True:
     for i in output:
         csv.csv_write(i)
         
-
-
-
+csv.close()
