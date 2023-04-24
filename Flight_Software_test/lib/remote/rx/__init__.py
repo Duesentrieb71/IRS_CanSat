@@ -113,9 +113,6 @@ class RX():
         else:
             self._data[key] = res
             print('Key "{}" stored.'.format(key))
-            led.value(1)
-            time.sleep(1)
-            led.value(0)
 
     def load(self, fname):  # Import file (will overwrite existing keys)
         try:
