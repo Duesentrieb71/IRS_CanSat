@@ -8,6 +8,8 @@ from utime import ticks_us, ticks_diff
 import ujson
 import gc
 from math import sqrt
+from machine import Pin
+led = Pin("LED", Pin.OUT)
 
 class RX():
 
@@ -84,6 +86,14 @@ class RX():
             m = [round(sum(x)/cnt) for x in zip(*res)]  # Mean values
             s = [sqrt(sum([(y - m[i])**2 for y in x])) for i, x in enumerate(zip(*res))]  # Standard deviations
             print('Capture quality {:5.1f} (perfect = 0)'.format(sum(s)/len(s)))
+
+            #TODO blink LED if successful
+            if sum(s)/len(s) > 45:
+                print('FAIL: should be less than 45.')
+            else:
+                print('SUCCESS: is less than 45.')
+                led.toggle()
+
             return [round(x) for x in m]
 
     def __call__(self, key):
