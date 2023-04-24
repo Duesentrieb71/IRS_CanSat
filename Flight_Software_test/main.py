@@ -1,0 +1,1 @@
+#TODO capture sensor data and receive from ground station at the same time with asyncio
