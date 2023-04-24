@@ -15,3 +15,5 @@ def callback(button):
         debounce_time = time.ticks_ms()
 
 button.irq(trigger=Pin.IRQ_FALLING, handler=callback)
+
+transmit = TX(pin(), reps=10)

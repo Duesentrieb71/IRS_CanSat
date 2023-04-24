@@ -23,6 +23,14 @@ recv = RX(pin())
 
 def pair(key):
     recv(key)
+
+    starttime = time.ticks_ms()
+    while time.ticks_ms() - starttime < 500:
+        led.value(1)
+        time.sleep(0.1)
+        led.value(0)
+        time.sleep(0.1)
+        
     time.delay(5)
     recv.save('remotes')
     
@@ -30,5 +38,6 @@ def pair(key):
 while True:
     if interrupt_flag == 1:
         interrupt_flag = 0
-        led.toggle()
-        recv.save('remotes')
+        pair('on')
+
+        

@@ -9,6 +9,7 @@ import ujson
 import gc
 from math import sqrt
 from machine import Pin
+import time
 led = Pin("LED", Pin.OUT)
 
 class RX():
@@ -87,13 +88,6 @@ class RX():
             s = [sqrt(sum([(y - m[i])**2 for y in x])) for i, x in enumerate(zip(*res))]  # Standard deviations
             print('Capture quality {:5.1f} (perfect = 0)'.format(sum(s)/len(s)))
 
-            #TODO blink LED if successful
-            if sum(s)/len(s) > 45:
-                print('FAIL: should be less than 45.')
-            else:
-                print('SUCCESS: is less than 45.')
-                led.toggle()
-
             return [round(x) for x in m]
 
     def __call__(self, key):
@@ -119,6 +113,9 @@ class RX():
         else:
             self._data[key] = res
             print('Key "{}" stored.'.format(key))
+            led.value(1)
+            time.sleep(1)
+            led.value(0)
 
     def load(self, fname):  # Import file (will overwrite existing keys)
         try:
