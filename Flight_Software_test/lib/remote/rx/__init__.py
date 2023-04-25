@@ -10,7 +10,6 @@ import gc
 from math import sqrt
 from machine import Pin
 import time
-led = Pin("LED", Pin.OUT)
 
 class RX():
 
