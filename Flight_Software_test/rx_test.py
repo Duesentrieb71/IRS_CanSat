@@ -3,12 +3,15 @@ from lib.remote.rx.get_pin import pin
 from machine import Pin
 import time
 
-led = Pin("LED", Pin.OUT)
+led = Pin(1, Pin.OUT)
 
 recv = RX(pin())
 
 
 while True: # wait for trigger signal from ground station
+    led.value(1)
+    time.sleep(1)
+    led.value(0)
     recv.load('triggers_tmp')
     recv('trigger')
     recv.save('triggers_tmp')
