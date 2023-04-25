@@ -23,3 +23,4 @@ https://www.youtube.com/watch?v=_Fz9lJXu2DE
 #### Cheap but complicated solution
 https://www.reddit.com/r/raspberrypipico/comments/lrkw3f/how_to_use_radio_433_mhz_modules_with_raspberry/
 https://github.com/peterhinch/micropython_remote
+https://randomnerdtutorials.com/rf-433mhz-transmitter-receiver-module-with-arduino/
