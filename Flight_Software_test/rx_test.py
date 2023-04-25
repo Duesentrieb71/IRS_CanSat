@@ -7,20 +7,21 @@ led = Pin(1, Pin.OUT)
 
 recv = RX(pin())
 
+def blink(delay, reps=10):
+    for _ in range(reps):
+        led.toggle()
+        time.sleep(delay)
+
 
 while True: # wait for trigger signal from ground station
-    led.value(1)
-    time.sleep(1)
-    led.value(0)
+    blink(0.05)
     recv.load('triggers_tmp')
     recv('trigger')
     recv.save('triggers_tmp')
     triggers = open ('triggers', 'r')
     triggers_tmp = open ('triggers_tmp', 'r')
     if triggers.read() == triggers_tmp.read():
-        led.value(1)
-        time.sleep(3)
-        led.value(0)
+        blink(0.5, 10)
         break
     triggers.close()
     triggers_tmp.close()

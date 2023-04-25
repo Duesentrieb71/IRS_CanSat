@@ -5,24 +5,33 @@ import time
 import utime
 import uasyncio as asyncio
 
-
 debounce_time = 0
-button = Pin(5, Pin.IN, Pin.PULL_DOWN)
-led = Pin("LED", Pin.OUT)
-
-def callback(button):
-    global  debounce_time
-    if (time.ticks_ms() - debounce_time) > 500:
-        for _ in range(10):
-            transmit('trigger')
-            await asyncio.sleep_ms(delay)
-        debounce_time = time.ticks_ms()
-
-button.irq(trigger=Pin.IRQ_RISING, handler=callback)
 
 transmit = TX(pin(),fname='triggers', reps=10)
 
 delay = transmit.latency()
 
+led = Pin(1, Pin.OUT)
+
+button = Pin(5, Pin.IN, Pin.PULL_DOWN)
+
+def blink(delay, reps=5):
+    for _ in range(2*reps):
+        led.toggle()
+        time.sleep(delay)
+
+def callback(button):
+    global debounce_time
+    if utime.ticks_ms() - debounce_time > 500:
+        blink(0.05)
+        for _ in range(10):
+            blink(0.1, 1)
+            transmit('trigger')
+            #await asyncio.sleep_ms(delay)
+            time.sleep(delay/1000)
+        debounce_time = utime.ticks_ms()
+        
+button.irq(trigger=Pin.IRQ_RISING, handler=callback)
+
 while True:
-    pass
+    print(utime.ticks_ms())
