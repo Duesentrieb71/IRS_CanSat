@@ -24,9 +24,9 @@ while True: # wait for trigger signal from ground station
         break
     triggers.close()
     triggers_tmp.close()
-    recv.load('triggers_tmp')
-    del recv['trigger']
-    recv.save('triggers_tmp')
+    with open ('triggers_tmp', 'w') as f:
+        f.write("{"+"}")
+
 
 ### drop CanSat ###
 print('drop CanSat')
