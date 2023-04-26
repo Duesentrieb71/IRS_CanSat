@@ -7,8 +7,8 @@ led = Pin(1, Pin.OUT)
 
 recv = RX(pin())
 
-def blink(delay, reps=10):
-    for _ in range(reps):
+def blink(delay, reps=5):
+    for _ in range(2*reps):
         led.toggle()
         time.sleep(delay)
 
