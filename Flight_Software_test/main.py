@@ -1,8 +1,16 @@
+import comms
+import sensor_data
+import uasyncio # Using async from MicroPython
 
-interval_times = [193, 199, 200, 201, 202]
-if all(198 <= x <= 202 for x in interval_times):
-    print("Valid trigger")
-    print(interval_times)
-else:
-    print("Invalid trigger")
-    print(interval_times)
+released = False
+
+async def main():
+    task_get_status = uasyncio.create_task(comms.get_status())
+    task_get_data = uasyncio.create_task(sensor_data.get_data())
+    await uasyncio.gather(task_get_status, task_get_data)
+
+    print("done")
+
+
+if __name__ == "__main__":
+    uasyncio.run(main())
