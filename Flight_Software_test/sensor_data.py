@@ -30,10 +30,11 @@ csv = CSV('/sd/data.csv', header)
 
 
 # Frequency of data collection
+get_data_Hz = 100
 accel_Hz = 100
 gyro_Hz = 100
-pressure_Hz = 10
-temperature_Hz = 10
+pressure_Hz = 6
+temperature_Hz = 4
 
 async def read_accel(shared_data, lock):
     while True:
@@ -84,9 +85,7 @@ async def get_data(shared_data, lock):
         output = realtime + timestamp + imu_accel + imu_gyro + imu_temperature + pressure_pressure
         print(output)
         csv.csv_write(output)
-        await uasyncio.sleep(0.01)
-
-    csv.close()
+        await uasyncio.sleep(1/get_data_Hz)
 
 async def button_test_close_csv():
     button = Pin(15, Pin.IN, Pin.PULL_UP)
