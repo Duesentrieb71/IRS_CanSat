@@ -1,67 +1,45 @@
 from machine import I2C, Pin, SPI
-from lib.imu import MPU6050
-from lib.bmp280 import BMP280
+
 from lib.csv import CSV
-from lib import sdcard
+
 import uos
 import utime
 import time
 import uasyncio
 
-# Assign chip select (CS) pin (and start it high)
-cs = Pin(5, Pin.OUT)
-# Intialize SPI peripheral (start with 1 MHz)
-spi = SPI(0, baudrate=1000000, polarity=0, phase=0, bits=8, firstbit=SPI.MSB, sck=Pin(2), mosi=Pin(3), miso=Pin(4))
-# Initialize SD card
-sd = sdcard.SDCard(spi, cs = Pin(5, Pin.OUT))
-# Mount filesystem
-vfs = uos.VfsFat(sd)
-uos.mount(vfs, "/sd")
 
-#set up i2c bus
-i2c = I2C(id = 0, scl = Pin(1), sda = Pin(0), freq = 400000)
-#set up Inertial Measurement Unit
-imu = MPU6050(i2c)
-#set up pressure sensor
-pressure = BMP280(i2c)
-
-header = ['time', 'accel_x', 'accel_y', 'accel_z', 'gyro_x', 'gyro_y', 'gyro_z', 'temperature', 'pressure']
-csv = CSV('/sd/data.csv', header)
-
-
-# Frequency of data collection
-accel_Hz = 100
-gyro_Hz = 100
-pressure_Hz = 10
-temperature_Hz = 10
+header = ['test1', 'test2', 'test3', 'test4']
+csv = CSV('data.csv', header)
 
 async def read_accel(shared_data, lock):
     while True:
-        data = [imu.accel.x, imu.accel.y, imu.accel.z]
+        data = [time.time()]
         async with lock:
             shared_data['accel'] = data
-        await uasyncio.sleep(1/accel_Hz)
+        await uasyncio.sleep(5)
 
 async def read_gyro(shared_data, lock):
     while True:
-        data = [imu.gyro.x, imu.gyro.y, imu.gyro.z]
+        data = [time.time()]
         async with lock:
             shared_data['gyro'] = data
-        await uasyncio.sleep(1/gyro_Hz)
-
-async def read_temperature(shared_data, lock):
-    while True:
-        data = [imu.temperature]
-        async with lock:
-            shared_data['temperature'] = data
-        await uasyncio.sleep(1/temperature_Hz)
+        await uasyncio.sleep(0.01)
 
 async def read_pressure(shared_data, lock):
     while True:
-        data = [pressure.pressure]
+        data = [time.time()]
         async with lock:
             shared_data['pressure'] = data
-        await uasyncio.sleep(1/pressure_Hz)
+        await uasyncio.sleep(0.1)
+
+async def read_temperature(shared_data, lock):
+    while True:
+        data = [time.time()]
+        async with lock:
+            shared_data['temperature'] = data
+        await uasyncio.sleep(0.1)
+
+
 
 starttime_ms = utime.ticks_ms()
 starttime = time.time()
@@ -73,20 +51,22 @@ async def get_data(shared_data, lock):
         async with lock:
             imu_accel = shared_data['accel']
             imu_gyro = shared_data['gyro']
-            imu_temperature = shared_data['temperature']
             pressure_pressure = shared_data['pressure']
+            imu_temperature = shared_data['temperature']
 
         # Calculate timestamp
         timestamp = [utime.ticks_diff(utime.ticks_ms(), starttime_ms)]
         realtime = [time.time() - starttime]
 
         # Write data to CSV file
-        output = realtime + timestamp + imu_accel + imu_gyro + imu_temperature + pressure_pressure
+        output = realtime + timestamp + pressure_pressure + imu_temperature + imu_accel + imu_gyro
         print(output)
         csv.csv_write(output)
         await uasyncio.sleep(0.01)
 
+    
     csv.close()
+
 
 async def button_test_close_csv():
     button = Pin(15, Pin.IN, Pin.PULL_UP)
@@ -97,7 +77,7 @@ async def button_test_close_csv():
         else:
             print("button not pressed")
         await uasyncio.sleep(0.1)
-        
+
 async def main():
     # Create the shared data dictionary and lock
     shared_data = {'accel': [], 'gyro': [], 'pressure': [], 'temperature': []}
@@ -107,10 +87,15 @@ async def main():
     await uasyncio.gather(
         read_accel(shared_data, lock),
         read_gyro(shared_data, lock),
-        read_temperature(shared_data, lock),
         read_pressure(shared_data, lock),
-        get_data(shared_data, lock)
+        read_temperature(shared_data, lock),
+        get_data(shared_data, lock),
+        button_test_close_csv()
     )
 
-if __name__ == '__main__':
+uasyncio.run(main())
+
+
+if __name__ == "__main__":
     uasyncio.run(main())
+    
