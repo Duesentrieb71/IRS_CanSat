@@ -32,3 +32,4 @@ https://randomnerdtutorials.com/rf-433mhz-transmitter-receiver-module-with-ardui
 ### Switch to ESP32-CAM
 https://arduino-projekte.info/produkt/esp32-cam-mit-ov2640-kamera-modul/
 https://arduino-projekte.info/produkt/ov2640-75mm-68-grad-kamera-fuer-esp32-cam/
+https://github.com/plerup/espsoftwareserial/
