@@ -299,3 +299,17 @@ class SDCard:
             return self.sectors
         if op == 5:  # get block size in bytes
             return 512
+        
+import uos
+from machine import Pin, SPI
+
+def mount(cs_pin = 5, spi_bus =  0, sck_pin = 2, mosi_pin = 3, miso_pin = 4):
+    # Assign chip select (CS) pin (and start it high)
+    cs = Pin(cs_pin, Pin.OUT)
+    # Intialize SPI peripheral (start with 1 MHz)
+    spi = SPI(spi_bus, baudrate=1000000, polarity=0, phase=0, bits=8, firstbit=SPI.MSB, sck=Pin(sck_pin), mosi=Pin(mosi_pin), miso=Pin(miso_pin))
+    # Initialize SD card
+    sd = SDCard(spi, cs)
+    # Mount filesystem
+    vfs = uos.VfsFat(sd)
+    uos.mount(vfs, "/sd")
