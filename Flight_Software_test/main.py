@@ -13,12 +13,10 @@ async def main():
     task_get_data = uasyncio.create_task(sensor_data.collect_data()) # Datenaufzeichnung
     task_button_press_end = uasyncio.create_task(sensor_data.button_press_end()) # Knopfdruck zum Beenden
 
-    # Sobald der Knopf gedrückt wird, wird die Datenaufzeichnung und das Empfangen des Signals beendet
-    done, pending = await uasyncio.wait({task_get_status, task_get_data, task_button_press_end}, return_when=uasyncio.FIRST_COMPLETED)
-    
-    print("Knopf gedrückt, Aufzeichnung wird beendet")
-    for task in pending:
-        task.cancel()
+    # Das Programm wartet auf das Drücken des Knopfes zum Beenden der Datenaufzeichnung und des Empfangens des Funk-Signals
+    await uasyncio.gather(task_button_press_end)
+    task_get_status.cancel()
+    task_get_data.cancel()
 
 
 if __name__ == "__main__":
