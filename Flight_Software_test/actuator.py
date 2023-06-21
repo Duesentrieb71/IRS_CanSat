@@ -10,3 +10,9 @@ async def release_CanSat():
         print(i)
         await uasyncio.sleep(1)
     print("good luck!")
+
+async def blink_LED():
+    led = Pin(25, Pin.OUT)
+    for i in range(10):
+        led.value(not led.value())
+        await uasyncio.sleep(0.5)

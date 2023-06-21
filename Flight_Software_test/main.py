@@ -22,3 +22,7 @@ async def main():
 if __name__ == "__main__":
 
     uasyncio.run(main())
+
+
+# TODO: Add LED blinking to indicate that the program is running
+# TODO: look into interrupts for the button press

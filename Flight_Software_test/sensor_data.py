@@ -85,6 +85,20 @@ async def get_data(shared_data, lock):
         print(output)
         csv.csv_write(output)
         # await uasyncio.sleep(1/get_data_Hz)
+        
+async def collect_data():
+    # Create the shared data dictionary and lock
+    shared_data = {'accel': [], 'gyro': [], 'pressure': [], 'temperature': []}
+    lock = uasyncio.Lock()
+
+    # Run the coroutines
+    await uasyncio.gather(
+        read_accel(shared_data, lock),
+        read_gyro(shared_data, lock),
+        read_temperature(shared_data, lock),
+        read_pressure(shared_data, lock),
+        get_data(shared_data, lock)
+    )
 
 async def button_press_end():
     button = Pin(15, Pin.IN, Pin.PULL_UP)
@@ -107,20 +121,6 @@ async def button_press_start():
         else:
             print("button not pressed")
         await uasyncio.sleep(0.1)
-        
-async def collect_data():
-    # Create the shared data dictionary and lock
-    shared_data = {'accel': [], 'gyro': [], 'pressure': [], 'temperature': []}
-    lock = uasyncio.Lock()
-
-    # Run the coroutines
-    await uasyncio.gather(
-        read_accel(shared_data, lock),
-        read_gyro(shared_data, lock),
-        read_temperature(shared_data, lock),
-        read_pressure(shared_data, lock),
-        get_data(shared_data, lock)
-    )
 
 if __name__ == '__main__':
     uasyncio.run(collect_data())
