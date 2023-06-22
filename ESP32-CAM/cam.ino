@@ -1,7 +1,7 @@
 #include "esp_camera.h"
 #include "SD_MMC.h"
 
-// Camera configuration (based on your specific ESP32-CAM model)
+// Camera configuration
 #define PWDN_GPIO_NUM     32
 #define RESET_GPIO_NUM    -1
 #define XCLK_GPIO_NUM      0
@@ -18,6 +18,8 @@
 #define VSYNC_GPIO_NUM    25
 #define HREF_GPIO_NUM     23
 #define PCLK_GPIO_NUM     22
+
+int folderNumber = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -51,6 +53,20 @@ void setup() {
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG;
   config.frame_size = FRAMESIZE_SVGA;
+  /*
+    FRAMESIZE_QQVGA (160x120)
+    FRAMESIZE_QCIF (176x144)
+    FRAMESIZE_HQVGA (240x176)
+    FRAMESIZE_QVGA (320x240)
+    FRAMESIZE_CIF (400x296)
+    FRAMESIZE_HVGA (480x320)
+    FRAMESIZE_VGA (640x480) -> 8.2 FPS
+    FRAMESIZE_SVGA (800x600) -> 8.1 FPS -> our choice
+    FRAMESIZE_XGA (1024x768)
+    FRAMESIZE_SXGA (1280x1024)
+    FRAMESIZE_UXGA (1600x1200) -> 2.2 FPS
+    FRAMESIZE_QXGA (2048x1536)
+*/
   config.jpeg_quality = 12;
   config.fb_count = 1;
   
@@ -61,7 +77,13 @@ void setup() {
   }
 
   Serial.println("Camera and SD card ready");
-  int myInt = 0;
+
+  //search for existing folders and iterate the number to create a new folder for the images
+  while (SD_MMC.exists("/" + String(folderNumber))) {
+    folderNumber++;
+  }
+  SD_MMC.mkdir("/" + String(folderNumber));
+
 }
 
 void loop() {
@@ -74,18 +96,15 @@ void loop() {
     }
 
     // Save video frame to SD card
-    writeFile(SD_MMC, fb->buf, fb->len);
+    writeFile(SD_MMC, fb->buf, fb->len, folderNumber);
 
     // Return the frame buffer to the camera driver
     esp_camera_fb_return(fb);
 
-    // Adjust the delay for your desired frame rate (e.g., 30 FPS)
-    delay(1000);
-
 }
 
-void writeFile(fs::FS &fs, const uint8_t *data, size_t size) {
-  String path = "/video" + String(millis()) + ".jpg";
+void writeFile(fs::FS &fs, const uint8_t *data, size_t size, int folderNumber) {
+  String path = "/" + String(folderNumber) + "/" + String(millis()) + ".jpg";
 
   File file = fs.open(path.c_str(), FILE_WRITE);
   if (!file) {
@@ -97,3 +116,5 @@ void writeFile(fs::FS &fs, const uint8_t *data, size_t size) {
   file.close();
   Serial.printf("Saved to: %s\n", path.c_str());
 }
+
+//TODO make the recording start and stop with a button or signal from the main microcontroller
