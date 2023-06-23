@@ -8,8 +8,10 @@ async def main():
     task_button_press_start = uasyncio.create_task(sensor_data.button_press_start())
     await uasyncio.gather(task_button_press_start)
 
+    comms.switch_esp32_command() # Schaltet die Kamera ein
+
     # Es werden drei Tasks erstellt, die gleichzeitig ausgeführt werden
-    task_get_status = uasyncio.create_task(comms.get_status()) # Empfangen des Signals
+    task_get_status = uasyncio.create_task(comms.get_receiver_status()) # Empfangen des Signals
     task_get_data = uasyncio.create_task(sensor_data.collect_data()) # Datenaufzeichnung
     task_button_press_end = uasyncio.create_task(sensor_data.button_press_end()) # Knopfdruck zum Beenden
 
@@ -19,10 +21,13 @@ async def main():
     task_get_data.cancel()
 
 
+
 if __name__ == "__main__":
+    while True:
+        uasyncio.run(main())
 
-    uasyncio.run(main())
 
 
-# TODO: Add LED blinking to indicate that the program is running
 # TODO: look into interrupts for the button press
+# TODO: implement LED signaling for the status
+# TODO: (maybe) implement UART communication between the ESP32 and the pico

@@ -1,5 +1,6 @@
 #include "esp_camera.h"
 #include "SD_MMC.h"
+#include "stdio.h"
 
 // Camera configuration
 #define PWDN_GPIO_NUM     32
@@ -20,6 +21,11 @@
 #define PCLK_GPIO_NUM     22
 
 int folderNumber = 0;
+char folderName[3];
+
+//primitive signaling between the main microcontroller and the camera
+bool fromMain = false;
+bool toMain = false;
 
 void setup() {
   Serial.begin(115200);
@@ -82,29 +88,59 @@ void setup() {
   while (SD_MMC.exists("/" + String(folderNumber))) {
     folderNumber++;
   }
+  //assign folder name to the folderName array
+  sprintf(folderName, "folder_%d", folderNumber);
+
   SD_MMC.mkdir("/" + String(folderNumber));
 
+  //set GPIO 3 as output
+  pinMode(3, OUTPUT);
+  //set GPIO 1 as input
+  pinMode(1, INPUT);
+
+  //set GPIO 3 to low
+  digitalWrite(3, LOW);
+
+  //wait for the main microcontroller to signal that recording can start
+  while (!fromMain) {
+    checkFromMain();
+  }
+
+  //signal the main microcontroller that recording has started
+  switchToMain();
 }
 
 void loop() {
-    // Capture video frame
-    camera_fb_t *fb = esp_camera_fb_get();
 
-    if (!fb) {
-      Serial.println("Camera capture failed");
-      return;
-    }
+  //capture a frame every loop
+  captureFrame();
 
-    // Save video frame to SD card
-    writeFile(SD_MMC, fb->buf, fb->len, folderNumber);
-
-    // Return the frame buffer to the camera driver
-    esp_camera_fb_return(fb);
-
+  //check if the main microcontroller wants to stop recording and restart the ESP32-CAM
+  checkFromMain();
+  if (fromMain) {
+    switchToMain(); //signal the main microcontroller that the ESP32-CAM has restarted
+    ESP.restart();
+  }
 }
 
-void writeFile(fs::FS &fs, const uint8_t *data, size_t size, int folderNumber) {
-  String path = "/" + String(folderNumber) + "/" + String(millis()) + ".jpg";
+void captureFrame() {
+  // Capture video frame
+  camera_fb_t *fb = esp_camera_fb_get();
+
+  if (!fb) {
+    Serial.println("Camera capture failed");
+    return;
+  }
+
+  // Save video frame to SD card
+  writeFile(SD_MMC, fb->buf, fb->len);
+
+  // Return the frame buffer to the camera driver
+  esp_camera_fb_return(fb);
+}
+
+void writeFile(fs::FS &fs, const uint8_t *data, size_t size) {
+  String path = "/" + folderName + "/" + String(millis()) + ".jpg";
 
   File file = fs.open(path.c_str(), FILE_WRITE);
   if (!file) {
@@ -117,4 +153,27 @@ void writeFile(fs::FS &fs, const uint8_t *data, size_t size, int folderNumber) {
   Serial.printf("Saved to: %s\n", path.c_str());
 }
 
-//TODO make the recording start and stop with a button or signal from the main microcontroller
+void checkFromMain() {
+  //check if GPIO 1 is high
+  if (digitalRead(1) == HIGH) {
+    fromMain = true;
+  }
+  else {
+    fromMain = false;
+  }
+}
+
+void switchToMain() {
+  //set GPIO 3 to the opposite value of before
+  if (toMain) {
+    digitalWrite(3, LOW);
+    toMain = false;
+  }
+  else {
+    digitalWrite(3, HIGH);
+    toMain = true;
+  }
+}
+
+
+//TODO: (maybe) implement UART communication with the main microcontroller
