@@ -32,7 +32,7 @@ async def update_LED():
         elif not comms.esp32_status:
             # LED yellow
             pass
-        elif comms.esp32_status:
+        elif not comms.receiver_status:
             # LED blue
             pass
         elif comms.esp32_status and comms.receiver_status and sensor_data.sdcard_status and sensor_data.accel_status and sensor_data.gyro_status and sensor_data.pressure_status and sensor_data.temperature_status and sensor_data.write_data_status:

@@ -101,6 +101,9 @@ void setup() {
   //set GPIO 3 to low
   digitalWrite(3, LOW);
 
+  //sleep 3 seconds to allow the main microcontroller to boot
+  delay(3000);
+
   //wait for the main microcontroller to signal that recording can start
   while (!fromMain) {
     checkFromMain();

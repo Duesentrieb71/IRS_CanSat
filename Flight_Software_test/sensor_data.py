@@ -18,7 +18,10 @@ except:
     sdcard_status = False
 
 # Der I2C Bus wird initialisiert
-i2c = I2C(id = 0, scl = Pin(1), sda = Pin(0), freq = 400000)
+try:
+    i2c = I2C(id = 0, scl = Pin(1), sda = Pin(0), freq = 400000)
+except:
+    pass
 
 # Die MPU6050 und BMP280 Sensoren werden initialisiert
 imu = MPU6050(i2c) # IMU = Inertial Measurement Unit (Beschleunigungssensor und Gyroskop)
@@ -159,3 +162,8 @@ async def button_press_start():
 
 if __name__ == '__main__':
     uasyncio.run(collect_data())
+
+
+# TODO: consider moving the status logic to the initailization of the sensors instead of the read functions
+# pro: better performance (no need to check the status every time)
+# con: check only occurs once during initialization, so if the sensor fails later, the status will not be updated

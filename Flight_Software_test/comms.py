@@ -40,13 +40,14 @@ esp32_command = False
 esp32_status = False
 
 to_esp32 = Pin(8, Pin.OUT)
+to_esp32.value(esp32_command)
 from_esp32 = Pin(9, Pin.IN)
 
 def switch_esp32_command():
     global esp32_command
     # switch to_esp32 to the opposite state
-    to_esp32.value(not to_esp32.value())
     esp32_command = not esp32_command
+    to_esp32.value(esp32_command)
 
 async def check_esp32_status():
     global esp32_status
