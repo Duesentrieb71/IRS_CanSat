@@ -7,26 +7,18 @@ import uos
 import utime
 import time
 
-# Assign chip select (CS) pin (and start it high)
-cs = Pin(5, Pin.OUT)
+#sdcard.mount()
 
-# Intialize SPI peripheral (start with 1 MHz)
-spi = SPI(0,
-                  baudrate=1000000,
-                  polarity=0,
-                  phase=0,
-                  bits=8,
-                  firstbit=SPI.MSB,
-                  sck=Pin(2),
-                  mosi=Pin(3),
-                  miso=Pin(4))
+# Es wird geprüft, welche Ordner existieren und für das erstellen des nächsten Ordners wird inkrementiert
+folder_number = 1
 
-# Initialize SD card
-sd = sdcard.SDCard(spi, cs)
 
-# Mount filesystem
-vfs = uos.VfsFat(sd)
-uos.mount(vfs, "/sd")
+# Der Ordner wird erstellt
+try:
+    uos.mkdir('/sd/{}'.format(folder_number))
+except:
+    pass
+
 
 header = ['time', 'pressure', 'temperature', 'accel_x', 'accel_y', 'accel_z', 'gyro_x', 'gyro_y', 'gyro_z']
 
@@ -34,16 +26,10 @@ starttime_ms = utime.ticks_ms()
 
 timestamp = 0
 
-csv = CSV('/sd/data.csv', header)
-while timestamp < 1000:
+csv = CSV('/data3.csv'.format(folder_number), header)
+while timestamp < 100000:
     long_string = [timestamp, "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd", "sdsdsdsdsdsdsd"]
     csv.csv_write(long_string)
     timestamp = utime.ticks_diff(utime.ticks_ms(), starttime_ms)
     print(timestamp)
 csv.close()
-
-#copy file to main directory
-with open('/sd/data.csv', 'r') as f:
-    with open('data.csv', 'w') as f1:
-        for line in f:
-            f1.write(line)

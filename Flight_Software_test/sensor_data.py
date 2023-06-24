@@ -139,10 +139,9 @@ async def write_data(shared_data, lock):
 
             # Zeitstempel wird errechnet
             timestamp = [utime.ticks_diff(utime.ticks_ms(), starttime_ms)]
-            realtime = [time.time() - starttime]
 
             # Alle Daten werden in einer csv-Datei gespeichert
-            output = realtime + timestamp + imu_accel + imu_gyro + imu_temperature + pressure_pressure
+            output = timestamp + imu_accel + imu_gyro + imu_temperature + pressure_pressure
             print(output)
             csv.csv_write(output)
             write_data_status = True

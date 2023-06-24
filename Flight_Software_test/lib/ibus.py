@@ -1,4 +1,4 @@
-from machine import UART
+from machine import UART, Pin
 
 # Works by connecting to uart, transferring data and then disconnecting
 # Allows ibus to be polled regularly without creating a block
@@ -30,7 +30,7 @@ class IBus ():
     def __init__ (self, uart_num, baud=115200, num_channels=6):
         self.uart_num = uart_num
         self.baud = baud
-        self.uart = UART(self.uart_num, self.baud)
+        self.uart = UART(self.uart_num, self.baud, rxbuf=10, tx=None, rx=Pin(13))
         self.num_channels = num_channels
         # ch is channel value
         self.ch = []

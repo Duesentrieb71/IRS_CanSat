@@ -1,7 +1,10 @@
 import time
 from lib.ibus import IBus
+import os
+os.dupterm(None)  # Detach UART 0 from the REPL
 
-ibus_in = IBus(1, 115200, 10)
+ibus_in = IBus(0, 115200, 10)
+#uart = UART(1, baudrate=115200, rx=Pin.P15, tx=Pin.P16, timeout=10)
 
 released = False
 

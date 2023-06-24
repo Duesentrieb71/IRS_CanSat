@@ -1,12 +1,19 @@
-globalVar = 0
+import asyncio
 
-def changeGlobal():
-    global globalVar
-    globalVar = 1
+async def test1():
+    print("test1")
+    await asyncio.sleep(2)
+    print("test1")
 
-def printGlobal():
-    print(globalVar)
+async def test2():
+    print("test2")
+    await asyncio.sleep(1)
+    print("test2")
+
+async def main():
+    task1 = asyncio.create_task(test1())
+    task2 = asyncio.create_task(test2())
+    await asyncio.gather(task1)
 
 if __name__ == "__main__":
-    changeGlobal()
-    printGlobal()
+    asyncio.run(main())

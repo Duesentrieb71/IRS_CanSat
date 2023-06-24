@@ -26,7 +26,7 @@ async def release_CanSat():
 
 total_status = False
 
-np = neopixel.NeoPixel(Pin(16), 1)
+np = neopixel.NeoPixel(Pin(12), 1)
 green = (0, 255, 0)
 yellow = (255, 255, 0)
 red = (255, 0, 0)

@@ -3,6 +3,9 @@ import uasyncio # Using async from MicroPython
 from lib.ibus import IBus
 import actuator
 from machine import Pin
+import os
+
+os.dupterm(None)  # Detach UART 0 from the REPL
 
 # Erstellen eines IBus-Objekts (IBus ist ein Protokoll zur Kommunikation zwischen Empfänger und Mikrocontroller)
 ibus_in = IBus(0, 115200, 10)

@@ -21,7 +21,7 @@
 #define PCLK_GPIO_NUM     22
 
 int folderNumber = 0;
-char folderName[3];
+String folderName;
 
 //primitive signaling between the main microcontroller and the camera
 bool fromMain = false;
@@ -56,6 +56,7 @@ void setup() {
   config.pin_sscb_scl = SIOC_GPIO_NUM;
   config.pin_pwdn = PWDN_GPIO_NUM;
   config.pin_reset = RESET_GPIO_NUM;
+  config.pin_flash = -1;
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG;
   config.frame_size = FRAMESIZE_SVGA;
@@ -89,7 +90,7 @@ void setup() {
     folderNumber++;
   }
   //assign folder name to the folderName array
-  sprintf(folderName, "folder_%d", folderNumber);
+  folderName = String(folderNumber);
 
   SD_MMC.mkdir("/" + String(folderNumber));
 
