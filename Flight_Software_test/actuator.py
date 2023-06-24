@@ -4,6 +4,7 @@ import time
 import uasyncio # Using async from MicroPython
 import comms
 import sensor_data
+import neopixel
 
 async def release_CanSat():
     print("\nReleasing CanSat in")
@@ -25,23 +26,30 @@ async def release_CanSat():
 
 total_status = False
 
+np = neopixel.NeoPixel(Pin(16), 1)
+green = (0, 255, 0)
+yellow = (255, 255, 0)
+red = (255, 0, 0)
+
+
 async def update_LED():
     global total_status
     while True:
         if total_status: # For performance reasons this checked first and definded further down
-            # LED green
-            pass
-        elif not total_status and not comms.esp32_command: # indicates planned standby
-            # LED blue
-            pass
-        elif not comms.esp32_status:
-            # LED yellow
-            pass
-        elif comms.esp32_status and comms.receiver_status and sensor_data.sdcard_status and sensor_data.accel_status and sensor_data.gyro_status and sensor_data.pressure_status and sensor_data.temperature_status and sensor_data.write_data_status:
-            total_status = True # For performance reasons this is only set to True once all the sensors are working
+            np[0] = green
+            np.write()
+        elif comms.esp32_command and comms.esp32_status and comms.receiver_status and sensor_data.sdcard_status and sensor_data.accel_status and sensor_data.gyro_status and sensor_data.pressure_status and sensor_data.temperature_status and sensor_data.write_data_status:
+            total_status = True # For performance reasons this is only set to True here
+            np[0] = green
+            np.write()
+        elif not comms.esp32_command and not comms.esp32_status and not comms.receiver_status and not sensor_data.sdcard_status and not sensor_data.accel_status and not sensor_data.gyro_status and not sensor_data.pressure_status and not sensor_data.temperature_status and not sensor_data.write_data_status: # indicates planned standby
+            np[0] = yellow
+            np.write()
+            total_status = False
         else:
-            # LED red
-            pass
+            np[0] = red
+            np.write()
+            total_status = False
 
         print(
             "esp32_command: {} | esp32_status: {} | receiver_status: {} | sdcard_status: {} | accel_status: {} | gyro_status: {} | pressure_status: {} | temperature_status: {} | write_data_status: {}".format(comms.esp32_command,
