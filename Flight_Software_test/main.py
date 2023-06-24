@@ -2,25 +2,31 @@ import comms
 import sensor_data
 import actuator
 import uasyncio # Using async from MicroPython
+import machine
+import time
 
 # Funktion zur Datenaufzeichnung und zum Empfangen des Funk-Signals
 async def services():
-    while True:
-        # Das Programm wartet auf das Drücken des Knopfes zum Starten
-        task_button_press_start = uasyncio.create_task(sensor_data.button_press_start())
-        await uasyncio.gather(task_button_press_start)
+    # Das Programm wartet auf das Drücken des Knopfes zum Starten
+    task_button_press_start = uasyncio.create_task(sensor_data.button_press_start())
+    await uasyncio.gather(task_button_press_start)
+    comms.switch_esp32_command() # Schaltet die Kamera ein
 
-        comms.switch_esp32_command() # Schaltet die Kamera ein
+    # Es werden drei Tasks erstellt, die gleichzeitig ausgeführt werden
+    task_get_status = uasyncio.create_task(comms.get_receiver_status()) # Empfangen des Signals
+    task_get_data = uasyncio.create_task(sensor_data.collect_data()) # Datenaufzeichnung
+    task_button_press_end = uasyncio.create_task(sensor_data.button_press_end()) # Knopfdruck zum Beenden
 
-        # Es werden drei Tasks erstellt, die gleichzeitig ausgeführt werden
-        task_get_status = uasyncio.create_task(comms.get_receiver_status()) # Empfangen des Signals
-        task_get_data = uasyncio.create_task(sensor_data.collect_data()) # Datenaufzeichnung
-        task_button_press_end = uasyncio.create_task(sensor_data.button_press_end()) # Knopfdruck zum Beenden
-
-        # Das Programm wartet auf das Drücken des Knopfes zum Beenden der Datenaufzeichnung und des Empfangens des Funk-Signals
-        await uasyncio.gather(task_button_press_end)
-        task_get_status.cancel()
-        task_get_data.cancel()
+    # Das Programm wartet auf das Drücken des Knopfes zum Beenden der Datenaufzeichnung und des Empfangens des Funk-Signals
+    await uasyncio.gather(task_button_press_end)
+    sensor_data.csv.close() # Schließt die csv-Datei
+    task_get_status.cancel()
+    task_get_data.cancel()
+    comms.switch_esp32_command() # Schaltet die Kamera aus
+    actuator.reset_status() # Setzt den Status der Sensoren zurück
+    time.sleep(1)
+    # Pi Pico neustarten
+    machine.reset()
 
 
 async def main():
@@ -29,8 +35,7 @@ async def main():
     await uasyncio.gather(task_services, task_update_LED)
 
 if __name__ == "__main__":
-    while True:
-        uasyncio.run(main())
+    uasyncio.run(main())
 
 
 

@@ -20,20 +20,22 @@ async def release_CanSat():
 # temperature_status
 # write_data_status
 # esp32_status
+# esp32_command
 # receiver_status
 
 total_status = False
 
 async def update_LED():
+    global total_status
     while True:
         if total_status: # For performance reasons this checked first and definded further down
             # LED green
             pass
+        elif not total_status and not comms.esp32_command: # indicates planned standby
+            # LED blue
+            pass
         elif not comms.esp32_status:
             # LED yellow
-            pass
-        elif not comms.receiver_status:
-            # LED blue
             pass
         elif comms.esp32_status and comms.receiver_status and sensor_data.sdcard_status and sensor_data.accel_status and sensor_data.gyro_status and sensor_data.pressure_status and sensor_data.temperature_status and sensor_data.write_data_status:
             total_status = True # For performance reasons this is only set to True once all the sensors are working
@@ -42,7 +44,7 @@ async def update_LED():
             pass
 
         print(
-            "esp32_status: {} | receiver_status: {} | sdcard_status: {} | accel_status: {} | gyro_status: {} | pressure_status: {} | temperature_status: {} | write_data_status: {}".format(
+            "esp32_command: {} | esp32_status: {} | receiver_status: {} | sdcard_status: {} | accel_status: {} | gyro_status: {} | pressure_status: {} | temperature_status: {} | write_data_status: {}".format(comms.esp32_command,
                 comms.esp32_status, comms.receiver_status, sensor_data.sdcard_status, sensor_data.accel_status, sensor_data.gyro_status, sensor_data.pressure_status, sensor_data.temperature_status, sensor_data.write_data_status)
         )
 
@@ -50,3 +52,13 @@ async def update_LED():
             await uasyncio.sleep(1) # slower LED update rate when fully operational (for performance)
         else:
             await uasyncio.sleep(0.2)
+
+def reset_status(): # currently not used
+    comms.esp32_status = False
+    comms.receiver_status = False
+    sensor_data.sdcard_status = False
+    sensor_data.accel_status = False
+    sensor_data.gyro_status = False
+    sensor_data.pressure_status = False
+    sensor_data.temperature_status = False
+    sensor_data.write_data_status = False

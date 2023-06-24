@@ -93,16 +93,16 @@ void setup() {
 
   SD_MMC.mkdir("/" + String(folderNumber));
 
-  //set GPIO 3 as output
-  pinMode(3, OUTPUT);
-  //set GPIO 1 as input
-  pinMode(1, INPUT);
+  //set GPIO 1 as output
+  pinMode(1, OUTPUT);
+  //set GPIO 3 as input
+  pinMode(3, INPUT);
 
-  //set GPIO 3 to low
-  digitalWrite(3, LOW);
+  //set GPIO 1 to low
+  digitalWrite(1, LOW);
 
-  //sleep 3 seconds to allow the main microcontroller to boot
-  delay(3000);
+  //sleep 1 second to allow the main microcontroller to boot
+  delay(1000);
 
   //wait for the main microcontroller to signal that recording can start
   while (!fromMain) {
@@ -122,6 +122,7 @@ void loop() {
   checkFromMain();
   if (fromMain) {
     switchToMain(); //signal the main microcontroller that the ESP32-CAM has restarted
+    delay(1000); 
     ESP.restart();
   }
 }
@@ -157,25 +158,14 @@ void writeFile(fs::FS &fs, const uint8_t *data, size_t size) {
 }
 
 void checkFromMain() {
-  //check if GPIO 1 is high
-  if (digitalRead(1) == HIGH) {
-    fromMain = true;
-  }
-  else {
-    fromMain = false;
-  }
+  //check if GPIO 3 is high
+  fromMain = digitalRead(3);
 }
 
 void switchToMain() {
-  //set GPIO 3 to the opposite value of before
-  if (toMain) {
-    digitalWrite(3, LOW);
-    toMain = false;
-  }
-  else {
-    digitalWrite(3, HIGH);
-    toMain = true;
-  }
+  //set GPIO 1 to the opposite value of before
+  toMain = !toMain;
+  digitalWrite(1, toMain);
 }
 
 

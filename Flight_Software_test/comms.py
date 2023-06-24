@@ -5,7 +5,7 @@ import actuator
 from machine import Pin
 
 # Erstellen eines IBus-Objekts (IBus ist ein Protokoll zur Kommunikation zwischen Empfänger und Mikrocontroller)
-ibus_in = IBus(1, 115200, 10)
+ibus_in = IBus(0, 115200, 10)
 
 # Frequenz der Signalabfrage
 get_status_Hz = 100
@@ -15,6 +15,7 @@ receiver_status = False
 
 # Funktion zum Empfangen des Signals vom Empfänger
 async def get_receiver_status():
+    global receiver_status
     while True:
         res = ibus_in.read() # einlesen des Signals vom Empfänger
         # wenn ein Signal empfangen wurde, wird der Wert des 8. Kanals ausgegeben
