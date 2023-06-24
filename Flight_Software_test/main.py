@@ -12,29 +12,22 @@ async def services():
     await uasyncio.gather(task_button_press)
     time.sleep(1)
     comms.switch_esp32_command() # Schaltet die Kamera ein
-    print("test1")
 
     # Es werden drei Tasks erstellt, die gleichzeitig ausgeführt werden
     task_get_status = uasyncio.create_task(comms.get_receiver_status()) # Empfangen des Signals
-    print("test2")
     task_get_data = uasyncio.create_task(sensor_data.collect_data()) # Datenaufzeichnung
-    print("test3")
+    task_check_esp32_status = uasyncio.create_task(comms.check_esp32_status()) # Überprüfen des Status des ESP32
     task_button_press = uasyncio.create_task(sensor_data.button_press()) # Knopfdruck zum Beenden
-    print("test4")
 
     # Das Programm wartet auf das Drücken des Knopfes zum Beenden der Datenaufzeichnung und des Empfangens des Funk-Signals
     await uasyncio.gather(task_button_press)
-    print("test5")
     sensor_data.csv.close() # Schließt die csv-Datei
-    print("test6")
     task_get_status.cancel()
-    print("test7")
     task_get_data.cancel()
-    print("test8")
+    task_check_esp32_status.cancel()
     comms.switch_esp32_command() # Schaltet die Kamera aus
-    print("test9")
-    #actuator.reset_status() # Setzt den Status der Sensoren zurück
-    time.sleep(1)
+    actuator.reset_status() # Setzt den Status der Sensoren zurück
+    await uasyncio.sleep(1)
     # Pi Pico neustarten
     machine.reset()
 

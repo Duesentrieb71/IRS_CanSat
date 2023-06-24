@@ -28,12 +28,23 @@ bool fromMain = false;
 bool toMain = false;
 
 void setup() {
-  Serial.begin(115200);
+  delay(500);
+  //set GPIO 1 as output
+  pinMode(1, OUTPUT);
+  //set GPIO 3 as input
+  pinMode(3, INPUT);
+
+  //set GPIO 1 to low
+  digitalWrite(1, LOW);
+  
+  fromMain = false;
+  toMain = false;
+  //Serial.begin(115200);
 
   // Initialize SD card
   if (!SD_MMC.begin()) {
-    Serial.println("SD Card Mount Failed");
-    return;
+    //Serial.println("SD Card Mount Failed");
+    ESP.restart();
   }
 
   // Initialize camera
@@ -56,7 +67,6 @@ void setup() {
   config.pin_sscb_scl = SIOC_GPIO_NUM;
   config.pin_pwdn = PWDN_GPIO_NUM;
   config.pin_reset = RESET_GPIO_NUM;
-  config.pin_flash = -1;
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG;
   config.frame_size = FRAMESIZE_SVGA;
@@ -79,11 +89,11 @@ void setup() {
   
   esp_err_t err = esp_camera_init(&config);
   if (err != ESP_OK) {
-    Serial.printf("Camera init failed with error 0x%x", err);
+    //Serial.printf("Camera init failed with error 0x%x", err);
     return;
   }
 
-  Serial.println("Camera and SD card ready");
+  //Serial.println("Camera and SD card ready");
 
   //search for existing folders and iterate the number to create a new folder for the images
   while (SD_MMC.exists("/" + String(folderNumber))) {
@@ -94,16 +104,8 @@ void setup() {
 
   SD_MMC.mkdir("/" + String(folderNumber));
 
-  //set GPIO 1 as output
-  pinMode(1, OUTPUT);
-  //set GPIO 3 as input
-  pinMode(3, INPUT);
-
-  //set GPIO 1 to low
-  digitalWrite(1, LOW);
-
   //sleep 1 second to allow the main microcontroller to boot
-  delay(1000);
+  delay(500);
 
   //wait for the main microcontroller to signal that recording can start
   while (!fromMain) {
@@ -121,9 +123,9 @@ void loop() {
 
   //check if the main microcontroller wants to stop recording and restart the ESP32-CAM
   checkFromMain();
-  if (fromMain) {
+  if (!fromMain) {
     switchToMain(); //signal the main microcontroller that the ESP32-CAM has restarted
-    delay(1000); 
+    delay(2000); 
     ESP.restart();
   }
 }
@@ -133,7 +135,7 @@ void captureFrame() {
   camera_fb_t *fb = esp_camera_fb_get();
 
   if (!fb) {
-    Serial.println("Camera capture failed");
+    //Serial.println("Camera capture failed");
     return;
   }
 
@@ -149,13 +151,13 @@ void writeFile(fs::FS &fs, const uint8_t *data, size_t size) {
 
   File file = fs.open(path.c_str(), FILE_WRITE);
   if (!file) {
-    Serial.println("Failed to open file for writing");
+    //Serial.println("Failed to open file for writing");
     return;
   }
 
   file.write(data, size);
   file.close();
-  Serial.printf("Saved to: %s\n", path.c_str());
+  //Serial.printf("Saved to: %s\n", path.c_str());
 }
 
 void checkFromMain() {

@@ -24,6 +24,7 @@ try:
     sdcard_status = True
 except:
     sdcard_status = False
+    print("SD card not mounted")
 
 # Es wird geprüft, welche Ordner existieren und für das erstellen des nächsten Ordners wird inkrementiert
 folder_number = 1
@@ -142,7 +143,7 @@ async def write_data(shared_data, lock):
 
             # Alle Daten werden in einer csv-Datei gespeichert
             output = timestamp + imu_accel + imu_gyro + imu_temperature + pressure_pressure
-            print(output)
+            #print(output)
             csv.csv_write(output)
             write_data_status = True
         except:
@@ -171,7 +172,8 @@ async def button_press():
             print("button pressed")
             break
         else:
-            print("button not pressed")
+            #print("button not pressed")
+            pass
         await uasyncio.sleep(0.2)
 
 if __name__ == '__main__':
