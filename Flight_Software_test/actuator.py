@@ -6,12 +6,14 @@ import comms
 import sensor_data
 import neopixel
 
+# init Motor pwm
+motor = machine.PWM(Pin(14, Pin.OUT), freq=50, duty=0)
+
 async def release_CanSat():
-    print("\nReleasing CanSat in")
-    for i in range(5, 0, -1):
-        print(i)
-        await uasyncio.sleep(1)
-    print("good luck!")
+    print("\nReleasing CanSat")
+    motor.duty(100)
+    await uasyncio.sleep_ms(100)
+    motor.duty(0)
 
 
 # sdcard_status
