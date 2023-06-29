@@ -1,5 +1,5 @@
 #responsible for controlling the actuators which release the payload and the parachute
-from machine import Pin
+from machine import Pin, PWM
 import time
 import uasyncio # Using async from MicroPython
 import comms
@@ -7,13 +7,13 @@ import sensor_data
 import neopixel
 
 # init Motor pwm
-motor = machine.PWM(Pin(14, Pin.OUT), freq=50, duty=0)
+motor = PWM(Pin(14, Pin.OUT))
 
 async def release_CanSat():
     print("\nReleasing CanSat")
-    motor.duty(100)
+    motor.duty_u16(8192)
     await uasyncio.sleep_ms(100)
-    motor.duty(0)
+    motor.duty_u16(0)
 
 
 # sdcard_status
