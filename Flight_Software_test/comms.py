@@ -22,14 +22,15 @@ async def get_receiver_status():
         res = ibus_in.read() # einlesen des Signals vom Empfänger
         # wenn ein Signal empfangen wurde, wird der Wert des 8. Kanals ausgegeben
         if (res[0] == 1):
-            # druckt den Status des Empfängers und den Wert des 8. Kanals aus
-            print ("Status {} Ch 8 {}".format(res[0], IBus.normalize(res[8])), end="")
+            # Status des Empfängers und den Wert des 8. Kanals aus
+            status_ch8 = IBus.normalize(res[8])
+            print ("Status {} Ch 8 {}".format(1, status_ch8), end="")
             print(" - {}".format(time.ticks_ms()))
-            # wenn der Wert des 8. Kanals größer als 50 ist, wird die Funktion release_CanSat() aus actuator.py aufgerufen
-            # damit sich der Wert ändert, wird an der Fernsteuerung ein Schalter umgelegt
-            if (IBus.normalize(res[8]) > 50):
-                await actuator.release_CanSat()
-                break
+            # Wenn der Wert des 8. Kanals größer als 50 ist und der Motor aus ist, wird der Motor eingeschaltet
+            if (status_ch8 > 50 and actuator.motor_status == False):
+                await actuator.start_Motor()
+            elif (status_ch8 < 50 and actuator.motor_status == True):
+                await actuator.stop_Motor()
             receiver_status = True
         else:
             print ("Status offline {}".format(res[0]))

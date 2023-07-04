@@ -1,19 +1,22 @@
 #responsible for controlling the actuators which release the payload and the parachute
-from machine import Pin, PWM
+from machine import Pin
 import time
 import uasyncio # Using async from MicroPython
 import comms
 import sensor_data
 import neopixel
 
-# init Motor pwm
-motor = PWM(Pin(14, Pin.OUT))
+#Motor GPIO Pin (on/off)
+motor = Pin(14, Pin.OUT)
+motor_status = False
 
-async def release_CanSat():
-    print("\nReleasing CanSat")
-    motor.duty_u16(8192)
-    await uasyncio.sleep_ms(100)
-    motor.duty_u16(0)
+async def start_Motor():
+    motor.value(1)
+    motor_status = True
+
+async def stop_Motor():
+    motor.value(0)
+    motor_status = False
 
 
 # sdcard_status
