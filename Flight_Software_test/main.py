@@ -43,5 +43,4 @@ if __name__ == "__main__":
 
 
 # TODO: look into interrupts for the button press
-# TODO: implement LED signaling for the status
 # TODO: (maybe) implement UART communication between the ESP32 and the pico
