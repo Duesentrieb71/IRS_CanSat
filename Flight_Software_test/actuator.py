@@ -11,10 +11,12 @@ motor = Pin(14, Pin.OUT)
 motor_status = False
 
 async def start_Motor():
+    global motor_status
     motor.value(1)
     motor_status = True
 
 async def stop_Motor():
+    global motor_status
     motor.value(0)
     motor_status = False
 
