@@ -1,8 +1,9 @@
 import os
-import cv2
+import cv2 # $ pip install opencv-python opencv-python-headless
 import numpy as np
+import sys
 
-folder_path = "./images/7"
+folder_path = sys.argv[1]
 
 # Read image file names
 image_files = [f for f in os.listdir(folder_path) if f.endswith(".png") or f.endswith(".jpg")]
@@ -15,6 +16,9 @@ timestamps = [int(os.path.splitext(f)[0]) for f in image_files]
 time_diffs = [timestamps[i + 1] - timestamps[i] for i in range(len(timestamps) - 1)]
 avg_time_diff = np.mean(time_diffs)
 fps = 1000 / avg_time_diff
+print("Max time diff: ", np.max(time_diffs))
+print("Min time diff: ", np.min(time_diffs))
+print("Avg time diff: ", avg_time_diff)
 print("FPS: ", fps)
 
 # Read first image to get height, width and layers
