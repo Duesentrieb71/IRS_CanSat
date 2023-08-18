@@ -25,6 +25,7 @@ String folderName;
 
 //primitive signaling between the main microcontroller and the camera
 bool fromMain = false;
+int fromMainCounter = 0;
 bool toMain = false;
 
 void setup() {
@@ -93,6 +94,8 @@ void setup() {
     return;
   }
 
+  SD_MMC.begin("/sdcard", true); //quick hack to disable LED
+
   //Serial.println("Camera and SD card ready");
 
   //search for existing folders and iterate the number to create a new folder for the images
@@ -104,8 +107,8 @@ void setup() {
 
   SD_MMC.mkdir("/" + String(folderNumber));
 
-  //sleep 1 second to allow the main microcontroller to boot
-  delay(500);
+  //sleep 2 seconds to allow the main microcontroller to boot
+  delay(2000);
 
   //wait for the main microcontroller to signal that recording can start
   while (!fromMain) {
@@ -162,7 +165,17 @@ void writeFile(fs::FS &fs, const uint8_t *data, size_t size) {
 
 void checkFromMain() {
   //check if GPIO 3 is high
-  fromMain = digitalRead(3);
+  if (digitalRead(3) == HIGH) {
+    fromMainCounter++;
+  }
+  else {
+    fromMainCounter = 0;
+  }
+
+  //if GPIO 3 has been high for 100 loops, signal that the main microcontroller wants to stop recording
+  if (fromMainCounter >= 100) {
+    fromMain = true;
+  }
 }
 
 void switchToMain() {

@@ -20,20 +20,21 @@ async def get_receiver_status():
     global receiver_status
     while True:
         res = ibus_in.read() # einlesen des Signals vom Empfänger
-        # wenn ein Signal empfangen wurde, wird der Wert des 8. Kanals ausgegeben
+        # wenn ein Signal empfangen wurde, wird der Wert des 9. Kanals ausgegeben
         if (res[0] == 1):
-            # Status des Empfängers und den Wert des 8. Kanals aus
-            status_ch8 = IBus.normalize(res[8])
-            print ("Status {} Ch 8 {}".format(1, status_ch8), end="")
-            print(" - {}".format(time.ticks_ms()))
-            # Wenn der Wert des 8. Kanals größer als 50 ist und der Motor aus ist, wird der Motor eingeschaltet
-            if (status_ch8 > 50 and actuator.motor_status == False):
-                await actuator.start_Motor()
-            elif (status_ch8 < 50 and actuator.motor_status == True):
-                await actuator.stop_Motor()
+            status_ch9 = IBus.normalize(res[9])
+            # print ("Status {} Ch 9 {}".format(1, status_ch9), end="")
+            # print(" - {}".format(time.ticks_ms()))
+            # Wenn der 9. Kanal auf 100 steht und der Motor aus ist, wird der Motor in eine Richtung gedreht. Bei -100 wird der Motor in die andere Richtung gedreht. Bei 0 wird der Motor ausgeschaltet.
+            if (status_ch9 == 100 and actuator.motor_status == False):
+                await actuator.Motor_H_Bridge(1)
+            elif (status_ch9 == -100 and actuator.motor_status == False):
+                await actuator.Motor_H_Bridge(2)
+            elif (status_ch9 == 0 and actuator.motor_status == True):
+                await actuator.Motor_H_Bridge(0)
             receiver_status = True
         else:
-            print ("Status offline {}".format(res[0]))
+            # print ("Status offline {}".format(res[0]))
             receiver_status = False
         
         await uasyncio.sleep(1/get_status_Hz)
