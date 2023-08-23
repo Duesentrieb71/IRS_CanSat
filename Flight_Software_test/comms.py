@@ -10,7 +10,7 @@ os.dupterm(None)  # Detach UART 0 from the REPL
 ibus_in = IBus(0, 115200, 10)
 
 # Frequenz der Signalabfrage
-get_status_Hz = 2
+get_status_Hz = 5
 
 # Empfänger Status
 receiver_status = False

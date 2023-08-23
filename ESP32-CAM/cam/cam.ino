@@ -164,18 +164,23 @@ void writeFile(fs::FS &fs, const uint8_t *data, size_t size) {
 }
 
 void checkFromMain() {
-  //check if GPIO 3 is high
-  if (digitalRead(3) == HIGH) {
+  //check GPIO 3
+  int gpio3State = digitalRead(3);
+  if (gpio3State == LOW) {
     fromMainCounter++;
   }
   else {
     fromMainCounter = 0;
   }
-
-  //if GPIO 3 has been high for 100 loops, signal that the main microcontroller wants to stop recording
-  if (fromMainCounter >= 100) {
+  //if GPIO 3 has been low for 10 loops, signal that the main microcontroller wants to stop recording
+  if (fromMainCounter >= 10) {
+    fromMain = false;
+  }
+  //if GPIO 3 is high, signal that the main microcontroller wants to start / continue recording
+  if (gpio3State == HIGH) {
     fromMain = true;
   }
+
 }
 
 void switchToMain() {
