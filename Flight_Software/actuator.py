@@ -9,22 +9,17 @@ import neopixel
 # Motor H-Brücke (GP16/GP17)
 motor_1 = Pin(16, Pin.OUT)
 motor_2 = Pin(17, Pin.OUT)
-motor_status = False
 
 async def Motor_H_Bridge(direction):
-    global motor_status
     if direction == 1:
         motor_1.value(1)
         motor_2.value(0)
-        motor_status = True
     elif direction == 2:
         motor_1.value(0)
         motor_2.value(1)
-        motor_status = True
     elif direction == 0:
         motor_1.value(0)
         motor_2.value(0)
-        motor_status = False
 
 
 
