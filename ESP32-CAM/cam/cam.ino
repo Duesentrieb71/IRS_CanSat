@@ -107,8 +107,8 @@ void setup() {
 
   SD_MMC.mkdir("/" + String(folderNumber));
 
-  //sleep 2 seconds to allow the main microcontroller to boot
-  delay(2000);
+  //sleep to allow the main microcontroller to boot
+  delay(1000);
 
   //wait for the main microcontroller to signal that recording can start
   while (!fromMain) {
@@ -128,7 +128,7 @@ void loop() {
   checkFromMain();
   if (!fromMain) {
     switchToMain(); //signal the main microcontroller that the ESP32-CAM has restarted
-    delay(2000); 
+    delay(500); 
     ESP.restart();
   }
 }

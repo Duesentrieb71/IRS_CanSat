@@ -60,10 +60,9 @@ async def check_esp32_status():
     while True:
         if from_esp32.value():
             esp32_status = True
-            await uasyncio.sleep(1) # slower Pin reading rate when esp32 is operational (for performance)
         else:
             esp32_status = False
-            await uasyncio.sleep(0.2)
-
+        await uasyncio.sleep(0.2)
+        
 if __name__ == "__main__":
     uasyncio.run(get_receiver_status())
