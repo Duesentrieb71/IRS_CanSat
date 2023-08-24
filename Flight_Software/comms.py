@@ -1,4 +1,6 @@
-import time
+# Das comms Programm, das die Kommunikation mit dem Empfänger und dem ESP32 regelt.
+
+# Benötigte Bibliotheken
 import uasyncio # Using async from MicroPython
 from lib.ibus import IBus
 import actuator
@@ -23,8 +25,6 @@ async def get_receiver_status():
         # wenn ein Signal empfangen wurde, wird der Wert des 9. Kanals ausgegeben
         if (res[0] == 1):
             status_ch9 = IBus.normalize(res[9])
-            # print ("Status {} Ch 9 {}".format(1, status_ch9), end="")
-            # print(" - {}".format(time.ticks_ms()))
             # Je nach Position des Schalters wird der Motor in die eine oder andere Richtung gedreht oder gestoppt
             if (status_ch9 == 100): # Der Schalter ist standardmäßig oben. Dabei soll der Motor ausgeschaltet sein.
                 await actuator.Motor_H_Bridge(0)
@@ -34,7 +34,6 @@ async def get_receiver_status():
                 await actuator.Motor_H_Bridge(2)
             receiver_status = True
         else:
-            # print ("Status offline {}".format(res[0]))
             receiver_status = False
         
         await uasyncio.sleep(1/get_status_Hz)
@@ -50,13 +49,13 @@ from_esp32 = Pin(9, Pin.IN)
 
 def switch_esp32_command():
     global esp32_command
-    # switch to_esp32 to the opposite state
+    # schalte den ESP32 zum gegenteiligen Zustand
     esp32_command = not esp32_command
     to_esp32.value(esp32_command)
 
 async def check_esp32_status():
     global esp32_status
-    # check if from_esp32 is high
+    # überprüfe den Status des ESP32
     while True:
         if from_esp32.value():
             esp32_status = True

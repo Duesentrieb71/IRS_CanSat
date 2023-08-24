@@ -1,3 +1,6 @@
+# Das Hauptprogramm, das die anderen Programme aufruft und die Tasks erstellt. Es wird mit uasyncio gearbeitet, um die Tasks gleichzeitig auszuführen.
+
+# Benötigte Bibliotheken
 import comms
 import sensor_data
 import actuator

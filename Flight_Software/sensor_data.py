@@ -1,3 +1,6 @@
+# Das sensor_data Programm, das die Sensoren ausliest und die Daten in einer csv-Datei speichert.
+
+# Benötigte Bibliotheken
 import uos
 from machine import I2C, Pin
 from lib.imu import MPU6050

@@ -1,4 +1,6 @@
-#responsible for controlling the actuators which release the payload and the parachute
+# Das actuator Programm, das die Aktoren steuert und die LED aktualisiert.
+
+# Benötigte Bibliotheken
 from machine import Pin
 import time
 import uasyncio # Using async from MicroPython
@@ -10,6 +12,7 @@ import neopixel
 motor_1 = Pin(16, Pin.OUT)
 motor_2 = Pin(17, Pin.OUT)
 
+# Funktion zum Steuern der H-Brücke
 async def Motor_H_Bridge(direction):
     if direction == 1:
         motor_1.value(1)
@@ -36,29 +39,28 @@ async def Motor_H_Bridge(direction):
 
 total_status = False
 
+# Die LED und ihre Farben werden definiert
 np = neopixel.NeoPixel(Pin(12), 1)
-green = (0, 255, 0)
+green = (0, 255, 0) # Werte beschreiben die Farbe in Rot, Grün, Blau Anteilen
 blue = (0, 0, 255)
 red = (255, 0, 0)
 orange = (255, 165, 0)
 violett = (238, 130, 238)
 
-
+# Funktion zum Aktualisieren der LED. Es wird der Status jeder Komponente überprüft und die LED entsprechend eingestellt.
 async def update_LED():
     while True:
-        if comms.esp32_command and comms.esp32_status and comms.receiver_status and sensor_data.sdcard_status and sensor_data.accel_status and sensor_data.gyro_status and sensor_data.pressure_status and sensor_data.temperature_status and sensor_data.write_data_status: # indicates fully operational
+        if comms.esp32_command and comms.esp32_status and comms.receiver_status and sensor_data.sdcard_status and sensor_data.accel_status and sensor_data.gyro_status and sensor_data.pressure_status and sensor_data.temperature_status and sensor_data.write_data_status: # voll funktionsfähig
             np[0] = green
             np.write()
-        elif not comms.esp32_command and not comms.esp32_status and not comms.receiver_status and sensor_data.sdcard_status and not sensor_data.accel_status and not sensor_data.gyro_status and not sensor_data.pressure_status and not sensor_data.temperature_status and not sensor_data.write_data_status: # indicates planned standby
+        elif not comms.esp32_command and not comms.esp32_status and not comms.receiver_status and sensor_data.sdcard_status and not sensor_data.accel_status and not sensor_data.gyro_status and not sensor_data.pressure_status and not sensor_data.temperature_status and not sensor_data.write_data_status: # geplanter Standby
             np[0] = blue
             np.write()
         elif comms.esp32_command and not comms.esp32_status and comms.receiver_status and sensor_data.sdcard_status and sensor_data.accel_status and sensor_data.gyro_status and sensor_data.pressure_status and sensor_data.temperature_status and sensor_data.write_data_status:
-            np[0] = orange # Everything is fine except the ESP32-CAM
-            # print("ESP32-CAM not responding")
+            np[0] = orange # voll funktionsfähig außer ESP32-CAM
             np.write()
         elif comms.esp32_command and comms.esp32_status and not comms.receiver_status and sensor_data.sdcard_status and sensor_data.accel_status and sensor_data.gyro_status and sensor_data.pressure_status and sensor_data.temperature_status and sensor_data.write_data_status:
-            np[0] = violett # Everything is fine except the receiver
-            # print("Sensors not responding")
+            np[0] = violett # voll funktionsfähig außer Empfänger
             np.write()
         else:
             np[0] = red
