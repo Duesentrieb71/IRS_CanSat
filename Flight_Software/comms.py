@@ -25,13 +25,13 @@ async def get_receiver_status():
             status_ch9 = IBus.normalize(res[9])
             # print ("Status {} Ch 9 {}".format(1, status_ch9), end="")
             # print(" - {}".format(time.ticks_ms()))
-            # Wenn der 9. Kanal auf 100 steht und der Motor aus ist, wird der Motor in eine Richtung gedreht. Bei -100 wird der Motor in die andere Richtung gedreht. Bei 0 wird der Motor ausgeschaltet.
-            if (status_ch9 == 100):
-                await actuator.Motor_H_Bridge(1)
-            elif (status_ch9 == -100):
-                await actuator.Motor_H_Bridge(2)
-            elif (status_ch9 == 0):
+            # Je nach Position des Schalters wird der Motor in die eine oder andere Richtung gedreht oder gestoppt
+            if (status_ch9 == 100): # Der Schalter ist standardmäßig oben. Dabei soll der Motor ausgeschaltet sein.
                 await actuator.Motor_H_Bridge(0)
+            elif (status_ch9 == -100):
+                await actuator.Motor_H_Bridge(1)
+            elif (status_ch9 == 0):
+                await actuator.Motor_H_Bridge(2)
             receiver_status = True
         else:
             # print ("Status offline {}".format(res[0]))
