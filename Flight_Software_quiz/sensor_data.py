@@ -66,9 +66,10 @@ csv = CSV('/sd/{}/data.csv'.format(folder_number), header)
 
 
 # Frequenz der Datenaufzeichnung (Hz = Hertz = 1/s)
-accel_Hz = 100
+## Was wären sinnvolle Werte für die Frequenzen?
+accel_Hz = ###
 gyro_Hz = 100
-pressure_Hz = 6
+pressure_Hz = ###
 temperature_Hz = 4
 write_data_Hz = max(100, accel_Hz, gyro_Hz)
 
@@ -83,14 +84,16 @@ async def read_accel(shared_data, lock):
             accel_status = True
         except:
             accel_status = False
-        await uasyncio.sleep(1/accel_Hz)
+        ## Wie wird die Wartezeit anhand der Frequenz berechnet?
+        await uasyncio.sleep(###)
 
 # Funktion zum Auslesen der Gyroskopdaten
 async def read_gyro(shared_data, lock):
     global gyro_status
     while True:
-        try:
-            data = [imu.gyro.x, imu.gyro.y, imu.gyro.z]
+        try: 
+            ## Welche Achsen sollen ausgelesen werden?
+            data = ###
             async with lock:
                 shared_data['gyro'] = data
             gyro_status = True
@@ -104,8 +107,9 @@ async def read_temperature(shared_data, lock):
     while True:
         try:
             data = [imu.temperature]
-            async with lock:
-                shared_data['temperature'] = data
+            async with lock: 
+                ## Welchen Name hat der Schlüssel in diesem Fall?
+                shared_data[###] = data
             temperature_status = True
         except:
             temperature_status = False
@@ -127,7 +131,7 @@ async def read_pressure(shared_data, lock):
 starttime_ms = utime.ticks_ms()
 timestamp = 0
 
-# Funktion zum Sammeln und Speichern aller Daten
+# Funktion zum Sammeln und Speichern aller Daten. Es wird ein "shared_data" Dictionary erstellt. Darin hat jeder Wert einen Schlüssel. Mit dem Schlüssel kann auf den Wert zugegriffen werden.
 async def write_data(shared_data, lock):
     global write_data_status
     while True:
