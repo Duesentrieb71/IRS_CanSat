@@ -125,9 +125,7 @@ async def read_pressure(shared_data, lock):
         await uasyncio.sleep(1/pressure_Hz)
 
 starttime_ms = utime.ticks_ms()
-starttime = time.time()
 timestamp = 0
-schedule_counter = 0
 
 # Funktion zum Sammeln und Speichern aller Daten
 async def write_data(shared_data, lock):

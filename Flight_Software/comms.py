@@ -38,20 +38,17 @@ async def get_receiver_status():
         
         await uasyncio.sleep(1/get_status_Hz)
 
-# Kommando an den ESP32
-esp32_command = False
 # Status des ESP32
 esp32_status = False
 
 to_esp32 = Pin(8, Pin.OUT)
-to_esp32.value(esp32_command)
 from_esp32 = Pin(9, Pin.IN)
 
-def switch_esp32_command():
-    global esp32_command
-    # schalte den ESP32 zum gegenteiligen Zustand
-    esp32_command = not esp32_command
-    to_esp32.value(esp32_command)
+def esp32_on():
+    to_esp32.value(1)
+
+def esp32_off():
+    to_esp32.value(0)
 
 async def check_esp32_status():
     global esp32_status
