@@ -38,10 +38,13 @@ async def get_receiver_status():
         
         await uasyncio.sleep(1/get_status_Hz)
 
+# Kommando an den ESP32
+esp32_command = False
 # Status des ESP32
 esp32_status = False
 
 to_esp32 = Pin(8, Pin.OUT)
+to_esp32.value(esp32_command)
 from_esp32 = Pin(9, Pin.IN)
 
 def esp32_on():
