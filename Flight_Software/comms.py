@@ -28,9 +28,9 @@ async def get_receiver_status():
             # Je nach Position des Schalters wird der Motor in die eine oder andere Richtung gedreht oder gestoppt
             if (status_ch9 == 100): # Der Schalter ist standardmäßig oben. Dabei soll der Motor ausgeschaltet sein.
                 await actuator.Motor_H_Bridge(0)
-            elif (status_ch9 == -100):
-                await actuator.Motor_H_Bridge(1)
             elif (status_ch9 == 0):
+                await actuator.Motor_H_Bridge(1)
+            elif (status_ch9 == -100):
                 await actuator.Motor_H_Bridge(2)
             receiver_status = True
         else:
