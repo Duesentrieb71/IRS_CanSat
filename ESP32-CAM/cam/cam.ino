@@ -168,16 +168,14 @@ void checkFromMain() {
   int gpio16State = digitalRead(16);
   if (gpio16State == LOW) {
     fromMainCounter++;
+    //if GPIO 16 has been low for 10 loops, signal that the main microcontroller wants to stop recording
+    if (fromMainCounter >= 10) {
+      fromMain = false;
+      fromMainCounter = 10; //prevent overflow
+    }
   }
   else {
     fromMainCounter = 0;
-  }
-  //if GPIO 16 has been low for 10 loops, signal that the main microcontroller wants to stop recording
-  if (fromMainCounter >= 10) {
-    fromMain = false;
-  }
-  //if GPIO 16 is high, signal that the main microcontroller wants to start / continue recording
-  if (gpio16State == HIGH) {
     fromMain = true;
   }
 }
