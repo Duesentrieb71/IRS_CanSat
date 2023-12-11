@@ -26,11 +26,11 @@ async def get_receiver_status():
         if (res[0] == 1):
             status_ch9 = IBus.normalize(res[9])
             # Je nach Position des Schalters wird der Motor in die eine oder andere Richtung gedreht oder gestoppt
-            if (status_ch9 == 100): # Der Schalter ist standardmäßig oben. Dabei soll der Motor ausgeschaltet sein.
+            if (status_ch9 == -100): # Der Schalter ist standardmäßig oben. Dabei soll der Motor ausgeschaltet sein.
                 await actuator.Motor_H_Bridge(0)
             elif (status_ch9 == 0):
                 await actuator.Motor_H_Bridge(1)
-            elif (status_ch9 == -100):
+            elif (status_ch9 == 100):
                 await actuator.Motor_H_Bridge(2)
             receiver_status = True
         else:
@@ -48,10 +48,14 @@ to_esp32.value(esp32_command)
 from_esp32 = Pin(9, Pin.IN)
 
 def esp32_on():
+    global esp32_command
     to_esp32.value(1)
+    esp32_command = True
 
 def esp32_off():
+    global esp32_command
     to_esp32.value(0)
+    esp32_command = False
 
 async def check_esp32_status():
     global esp32_status
