@@ -30,13 +30,13 @@ bool toMain = false;
 
 void setup() {
   delay(500);
-  //set GPIO 1 as output
-  pinMode(1, OUTPUT);
-  //set GPIO 3 as input
-  pinMode(3, INPUT);
+  //set GPIO 0 as output
+  pinMode(0, OUTPUT);
+  //set GPIO 16 as input
+  pinMode(16, INPUT);
 
-  //set GPIO 1 to low
-  digitalWrite(1, LOW);
+  //set GPIO 0 to low
+  digitalWrite(0, LOW);
   
   fromMain = false;
   toMain = false;
@@ -164,30 +164,26 @@ void writeFile(fs::FS &fs, const uint8_t *data, size_t size) {
 }
 
 void checkFromMain() {
-  //check GPIO 3
-  int gpio3State = digitalRead(3);
-  if (gpio3State == LOW) {
+  //check GPIO 16
+  int gpio16State = digitalRead(16);
+  if (gpio16State == LOW) {
     fromMainCounter++;
   }
   else {
     fromMainCounter = 0;
   }
-  //if GPIO 3 has been low for 10 loops, signal that the main microcontroller wants to stop recording
+  //if GPIO 16 has been low for 10 loops, signal that the main microcontroller wants to stop recording
   if (fromMainCounter >= 10) {
     fromMain = false;
   }
-  //if GPIO 3 is high, signal that the main microcontroller wants to start / continue recording
-  if (gpio3State == HIGH) {
+  //if GPIO 16 is high, signal that the main microcontroller wants to start / continue recording
+  if (gpio16State == HIGH) {
     fromMain = true;
   }
-
 }
 
 void switchToMain() {
-  //set GPIO 1 to the opposite value of before
+  //set GPIO 0 to the opposite value of before
   toMain = !toMain;
-  digitalWrite(1, toMain);
+  digitalWrite(0, toMain);
 }
-
-
-//TODO: (maybe) implement UART communication with the main microcontroller
