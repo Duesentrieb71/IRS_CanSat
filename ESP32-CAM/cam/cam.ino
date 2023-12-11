@@ -32,8 +32,8 @@ void setup() {
   delay(500);
   //set GPIO 0 as output
   pinMode(0, OUTPUT);
-  //set GPIO 16 as input
-  pinMode(16, INPUT);
+  //set GPIO 16 as input, PULLDOWN
+  pinMode(16, INPUT_PULLDOWN);
 
   //set GPIO 0 to low
   digitalWrite(0, LOW);

@@ -45,7 +45,7 @@ esp32_status = False
 
 to_esp32 = Pin(8, Pin.OUT)
 to_esp32.value(esp32_command)
-from_esp32 = Pin(9, Pin.IN)
+from_esp32 = Pin(9, Pin.IN, Pin.PULL_DOWN)
 
 def esp32_on():
     global esp32_command
