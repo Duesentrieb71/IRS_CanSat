@@ -30,10 +30,10 @@ bool toMain = false;
 
 void setup() {
   delay(500);
-  //set GPIO 0 as output
-  pinMode(0, OUTPUT);
-  //set GPIO 16 as input, PULLDOWN
-  pinMode(16, INPUT_PULLDOWN);
+  //set GPIO 1 as output
+  pinMode(1, OUTPUT);
+  //set GPIO 3 as input, PULLDOWN
+  pinMode(3, INPUT_PULLDOWN);
 
   //set GPIO 0 to low
   digitalWrite(0, LOW);
@@ -164,11 +164,11 @@ void writeFile(fs::FS &fs, const uint8_t *data, size_t size) {
 }
 
 void checkFromMain() {
-  //check GPIO 16
-  int gpio16State = digitalRead(16);
-  if (gpio16State == LOW) {
+  //check GPIO 3
+  int gpio3State = digitalRead(3);
+  if (gpio3State == LOW) {
     fromMainCounter++;
-    //if GPIO 16 has been low for 10 loops, signal that the main microcontroller wants to stop recording
+    //if GPIO 3 has been low for 10 loops, signal that the main microcontroller wants to stop recording
     if (fromMainCounter >= 10) {
       fromMain = false;
       fromMainCounter = 10; //prevent overflow
@@ -181,7 +181,7 @@ void checkFromMain() {
 }
 
 void switchToMain() {
-  //set GPIO 0 to the opposite value of before
+  //set GPIO 1 to the opposite value of before
   toMain = !toMain;
-  digitalWrite(0, toMain);
+  digitalWrite(1, toMain);
 }
