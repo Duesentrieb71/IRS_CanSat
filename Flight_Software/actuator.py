@@ -41,7 +41,7 @@ LED_B = Pin(20, Pin.OUT)
 total_status = False
 
 # Die Funktion zum Aktualisieren der LED
-async def update_LED(color: tuple(int, int, int)):
+async def update_LED_color(color: tuple(int, int, int)):
     LED_R.value(color[0])
     LED_G.value(color[1])
     LED_B.value(color[2])
