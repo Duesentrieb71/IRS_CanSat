@@ -1,7 +1,7 @@
 # Das actuator Programm, das den Motor steuert und die LED aktualisiert.
 
 # Benötigte Bibliotheken
-from machine import Pin
+from machine import Pin, PWM
 import uasyncio # Using async from MicroPython
 import comms
 import sensor_data
@@ -23,9 +23,19 @@ async def Motor_H_Bridge(direction):
         motor_2.value(0)
 
 # RGB LED Pins
-LED_R = Pin(18, Pin.OUT)
-LED_G = Pin(19, Pin.OUT)
-LED_B = Pin(20, Pin.OUT)
+LED_R = PWM(Pin(18))
+LED_G = PWM(Pin(19))
+LED_B = PWM(Pin(20))
+
+# Set frequency and duty cycle separately
+LED_R.freq(50)
+LED_R.duty_u16(0)
+
+LED_G.freq(50)
+LED_G.duty_u16(0)
+
+LED_B.freq(50)
+LED_B.duty_u16(0)
 
 
 # sdcard_status
@@ -41,17 +51,17 @@ LED_B = Pin(20, Pin.OUT)
 total_status = False
 
 # Die Funktion zum Aktualisieren der LED
-async def update_LED_color(color: tuple(int, int, int)):
-    LED_R.value(color[0])
-    LED_G.value(color[1])
-    LED_B.value(color[2])
+async def update_LED_color(color: tuple[int, int, int]):
+    LED_R.duty_u16(color[0] * 65535 * 0.5)
+    LED_G.duty_u16(color[1] * 65535 * 0.5)
+    LED_B.duty_u16(color[2] * 65535 * 0.5)
 
 
 red = (1, 0, 0) # Werte beschreiben die Farbe in Rot, Grün, Blau Anteilen
 green = (0, 1, 0)
 blue = (0, 0, 1)
-orange = (1, 0.65, 0)
-white = (1, 1, 1)
+orange = (0.7, 0.45, 0)
+white = (0.4, 0.4, 0.4)
 
 # Es wird der Status jeder Komponente überprüft und die LED entsprechend eingestellt.
 async def update_LED():
