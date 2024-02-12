@@ -52,9 +52,9 @@ total_status = False
 
 # Die Funktion zum Aktualisieren der LED
 async def update_LED_color(color: tuple[int, int, int]):
-    LED_R.duty_u16(color[0] * 65535 * 0.5)
-    LED_G.duty_u16(color[1] * 65535 * 0.5)
-    LED_B.duty_u16(color[2] * 65535 * 0.5)
+    LED_R.duty_u16(round(color[0] * 65535 * 0.5))
+    LED_G.duty_u16(round(color[1] * 65535 * 0.5))
+    LED_B.duty_u16(round(color[2] * 65535 * 0.5))
 
 
 red = (1, 0, 0) # Werte beschreiben die Farbe in Rot, Grün, Blau Anteilen
