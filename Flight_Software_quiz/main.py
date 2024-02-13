@@ -15,7 +15,7 @@ async def services():
     # Das Programm wartet auf das Drücken des Knopfes zum Starten
     task_button_press = uasyncio.create_task(sensor_data.button_press())
     await uasyncio.gather(task_button_press)
-    await uasyncio.sleep(0.5) # Warte 0.5 Sekunden, um sicherzustellen, dass der Knopf nicht mehr gedrückt ist
+    time.sleep(0.5) # Warte 0.5 Sekunden, um sicherzustellen, dass der Knopf nicht mehr gedrückt ist
     comms.esp32_on() # Schaltet die Kamera ein
 
     # Es werden drei Tasks erstellt, die gleichzeitig ausgeführt werden. Ein Task ist eine Funktion, die asynchron ausgeführt wird.

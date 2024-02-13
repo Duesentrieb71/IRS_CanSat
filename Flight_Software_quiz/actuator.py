@@ -1,11 +1,10 @@
 # Das actuator Programm, das den Motor steuert und die LED aktualisiert.
 
 # Benötigte Bibliotheken
-from machine import Pin
+from machine import Pin, PWM
 import uasyncio # Using async from MicroPython
 import comms
 import sensor_data
-import neopixel
 
 # Motor H-Brücke (GP16/GP17)
 motor_1 = Pin(16, Pin.OUT)
@@ -23,7 +22,20 @@ async def Motor_H_Bridge(direction):
         motor_1.value(0)
         motor_2.value(0)
 
+# RGB LED Pins
+LED_R = PWM(Pin(18))
+LED_G = PWM(Pin(19))
+LED_B = PWM(Pin(20))
 
+# Set frequency and duty cycle separately
+LED_R.freq(50)
+LED_R.duty_u16(0)
+
+LED_G.freq(50)
+LED_G.duty_u16(0)
+
+LED_B.freq(50)
+LED_B.duty_u16(0)
 
 
 # sdcard_status
@@ -38,34 +50,36 @@ async def Motor_H_Bridge(direction):
 
 total_status = False
 
-# Die LED und ihre Farben werden definiert
-np = neopixel.NeoPixel(Pin(12), 1)
-green = (0, 255, 0) # Werte beschreiben die Farbe in Rot, Grün, Blau Anteilen
-blue = (0, 0, 255)
-red = (255, 0, 0)
-orange = (255, 165, 0)
-violett = (238, 130, 238)
+# Die Funktion zum Aktualisieren der LED
+async def update_LED_color(color: tuple[int, int, int]):
+    LED_R.duty_u16(round(color[0] * 65535 * 0.5))
+    LED_G.duty_u16(round(color[1] * 65535 * 0.5))
+    LED_B.duty_u16(round(color[2] * 65535 * 0.5))
 
-# Funktion zum Aktualisieren der LED. Es wird der Status jeder Komponente überprüft und die LED entsprechend eingestellt.
+
+red = (1, 0, 0) # Werte beschreiben die Farbe in Rot, Grün, Blau Anteilen
+green = (0, 1, 0)
+blue = (0, 0, 1)
+orange = (0.7, 0.45, 0)
+white = (0.4, 0.4, 0.4)
+
+# Es wird der Status jeder Komponente überprüft und die LED entsprechend eingestellt.
 async def update_LED():
     while True:
-        if comms.esp32_status and comms.receiver_status and sensor_data.sdcard_status and sensor_data.accel_status and sensor_data.gyro_status and sensor_data.pressure_status and sensor_data.temperature_status and sensor_data.write_data_status: # voll funktionsfähig
-            np[0] = green
-            np.write()
-        elif not comms.esp32_status and not comms.receiver_status and sensor_data.sdcard_status and not sensor_data.accel_status and not sensor_data.gyro_status and not sensor_data.pressure_status and not sensor_data.temperature_status and not sensor_data.write_data_status: # geplanter Standby
-            np[0] = blue
-            np.write()
-        elif not comms.esp32_status and comms.receiver_status and sensor_data.sdcard_status and sensor_data.accel_status and sensor_data.gyro_status and sensor_data.pressure_status and sensor_data.temperature_status and sensor_data.write_data_status:
-            np[0] = orange # voll funktionsfähig außer ESP32-CAM
-            np.write()
-        elif comms.esp32_status and not comms.receiver_status and sensor_data.sdcard_status and sensor_data.accel_status and sensor_data.gyro_status and sensor_data.pressure_status and sensor_data.temperature_status and sensor_data.write_data_status:
-            np[0] = violett # voll funktionsfähig außer Empfänger
-            np.write()
+        if comms.esp32_command and comms.esp32_status and comms.receiver_status and sensor_data.sdcard_status and sensor_data.accel_status and sensor_data.gyro_status and sensor_data.pressure_status and sensor_data.temperature_status and sensor_data.write_data_status: # voll funktionsfähig
+            await update_LED_color(green)
+        elif not comms.esp32_command and not comms.esp32_status and not comms.receiver_status and sensor_data.sdcard_status and not sensor_data.accel_status and not sensor_data.gyro_status and not sensor_data.pressure_status and not sensor_data.temperature_status and not sensor_data.write_data_status: # geplanter Standby
+            await update_LED_color(blue)
+        elif comms.esp32_command and comms.esp32_command and not comms.esp32_status and comms.receiver_status and sensor_data.sdcard_status and sensor_data.accel_status and sensor_data.gyro_status and sensor_data.pressure_status and sensor_data.temperature_status and sensor_data.write_data_status:
+            # voll funktionsfähig außer ESP32-CAM
+            await update_LED_color(orange)
+        elif comms.esp32_command and comms.esp32_status and not comms.receiver_status and sensor_data.sdcard_status and sensor_data.accel_status and sensor_data.gyro_status and sensor_data.pressure_status and sensor_data.temperature_status and sensor_data.write_data_status:
+            # voll funktionsfähig außer Empfänger
+            await update_LED_color(white)
         else:
-            np[0] = red
-            np.write()
+            await update_LED_color(red)
 
-        # print("esp32: {} | receiver: {} | sdcard: {} | accel: {} | gyro: {} | pressure: {} | temperature: {} | write_data: {}".format(comms.esp32_status, comms.receiver_status, sensor_data.sdcard_status, sensor_data.accel_status, sensor_data.gyro_status, sensor_data.pressure_status, sensor_data.temperature_status, sensor_data.write_data_status))
+        # print("esp32_command: {} | esp32: {} | receiver: {} | sdcard: {} | accel: {} | gyro: {} | pressure: {} | temperature: {} | write_data: {}".format(comms.esp32_command, comms.esp32_status, comms.receiver_status, sensor_data.sdcard_status, sensor_data.accel_status, sensor_data.gyro_status, sensor_data.pressure_status, sensor_data.temperature_status, sensor_data.write_data_status))
 
         await uasyncio.sleep(0.5)
 
