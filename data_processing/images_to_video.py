@@ -43,9 +43,13 @@ millisecond_counter = int(os.path.splitext(image_files[0])[0])
 
 # Write images to video
 for image_file in image_files:
-    image = cv2.imread(os.path.join(folder_path, image_file))
-    while millisecond_counter <= int(os.path.splitext(image_file)[0]):
-        video_writer.write(image)
-        millisecond_counter += 1000 / fps
+    try:
+        image = cv2.imread(os.path.join(folder_path, image_file))
+        while millisecond_counter <= int(os.path.splitext(image_file)[0]):
+            video_writer.write(image)
+            millisecond_counter += 1000 / fps
+    except Exception as e:
+        print(f"Error reading image file: {image_file}")
+        continue
 
 video_writer.release()
