@@ -16,10 +16,18 @@ get_status_Hz = 5
 
 # Empfänger Status
 receiver_status = False
+logging_status = False
+
+async def logging_check():
+    global logging_status
+    while not logging_status:
+        await uasyncio.sleep(1/get_status_Hz)
+
 
 # Funktion zum Empfangen des Signals vom Empfänger
 async def get_receiver_status():
     global receiver_status
+    global logging_status
     while True:
         res = ibus_in.read() # einlesen des Signals vom Empfänger
         # wenn ein Signal empfangen wurde, wird der Wert des 9. Kanals ausgegeben
@@ -32,6 +40,11 @@ async def get_receiver_status():
                 await actuator.Motor_H_Bridge(1)
             elif (status_ch9 == 100):
                 await actuator.Motor_H_Bridge(2)
+            status_ch8 = IBus.normalize(res[8])
+            if (status_ch8 == -100):
+                logging_status = False
+            elif (status_ch8 == 100):
+                logging_status = True
             receiver_status = True
         else:
             receiver_status = False
