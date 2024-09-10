@@ -52,9 +52,9 @@ total_status = False
 
 # Die Funktion zum Aktualisieren der LED
 async def update_LED_color(color: tuple[int, int, int]):
-    LED_R.duty_u16(round(color[0] * 65535 * 0.5))
-    LED_G.duty_u16(round(color[1] * 65535 * 0.5))
-    LED_B.duty_u16(round(color[2] * 65535 * 0.5))
+    LED_R.duty_u16(round(color[0] * 65535))
+    LED_G.duty_u16(round(color[1] * 65535))
+    LED_B.duty_u16(round(color[2] * 65535))
 
 
 red = (1, 0, 0) # Werte beschreiben die Farbe in Rot, Grün, Blau Anteilen
@@ -62,6 +62,14 @@ green = (0, 1, 0)
 blue = (0, 0, 1)
 orange = (0.7, 0.45, 0)
 white = (0.4, 0.4, 0.4)
+
+def dimmer(color: tuple[float, float, float], factor: float) -> tuple[float, float, float]:
+    return (color[0] * factor, color[1] * factor, color[2] * factor)
+
+red = dimmer(red, 0.25)
+green = dimmer(green, 0.25)
+blue = dimmer(blue, 0.25)
+white = dimmer(white, 0.25)
 
 # Es wird der Status jeder Komponente überprüft und die LED entsprechend eingestellt.
 async def update_LED():
