@@ -15,7 +15,7 @@ async def services():
     # Das Programm wartet auf das Drücken des Knopfes zum Starten
     # task_button_press = uasyncio.create_task(sensor_data.button_press())
     task_get_status = uasyncio.create_task(comms.get_receiver_status()) # Empfangen des Funk-Signals
-    task_loggin_check = uasyncio.create_task(comms.logging_check())
+    task_loggin_check = uasyncio.create_task(comms.logging_check(True))
     await uasyncio.gather(task_loggin_check)
     # await uasyncio.gather(task_button_press)
     # time.sleep(0.5) # Warte 0.5 Sekunden, um sicherzustellen, dass der Knopf nicht mehr gedrückt ist
@@ -24,10 +24,12 @@ async def services():
     # Es werden drei Tasks erstellt, die gleichzeitig ausgeführt werden. Ein Task ist eine Funktion, die asynchron ausgeführt wird.
     task_get_data = uasyncio.create_task(sensor_data.collect_data()) # Datenaufzeichnung der Sensoren
     task_check_esp32_status = uasyncio.create_task(comms.check_esp32_status()) # Überprüfen des Status des ESP32
-    task_button_press = uasyncio.create_task(sensor_data.button_press()) # Knopfdruck zum Beenden
-
+    # task_button_press = uasyncio.create_task(sensor_data.button_press()) # Knopfdruck zum Beenden
+    task_loggin_check = uasyncio.create_task(comms.logging_check(False))
+    await uasyncio.gather(task_loggin_check)
     # Das Programm wartet auf das Drücken des Knopfes zum Beenden der Datenaufzeichnung und des Empfangens des Funk-Signals
-    await uasyncio.gather(task_button_press)
+    # await uasyncio.gather(task_button_press)
+
     # Alles wird beendet
     sensor_data.csv.close()
     task_get_status.cancel()

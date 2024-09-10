@@ -18,10 +18,12 @@ get_status_Hz = 5
 receiver_status = False
 logging_status = False
 
-async def logging_check():
+async def logging_check(break_condition = True):
     global logging_status
-    while not logging_status:
-        await uasyncio.sleep(1/get_status_Hz)
+    while True:
+        if logging_status == break_condition:
+            break
+        await uasyncio.sleep(0.1)
 
 
 # Funktion zum Empfangen des Signals vom Empfänger
